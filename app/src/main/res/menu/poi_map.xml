@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="li.itcc.flypostr.MainActivity">
+    <item
+        android:id="@+id/action_satellite"
+        android:orderInCategory="80"
+        android:title="@string/txt_satellite"
+        android:checkable="true"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_my_location"
+        android:orderInCategory="80"
+        android:title="@string/txt_my_location"
+        android:checkable="true"
+        app:showAsAction="never"/>
+
+</menu>

@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Flypostr</string>
+
+    <string name="title_poi_list">Liste</string>
+    <string name="title_overview_map">Karte</string>
+    <string name="title_section3">Über</string>
+
+    <string name="navigation_drawer_open">Seitenmenu öffnen</string>
+    <string name="navigation_drawer_close">Seitenmenu schliessen</string>
+
+    <string name="action_refresh">Aktualisieren</string>
+
+    <string name="action_settings">Einstellungen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="name">Name</string>
+    <string name="description">Beschreibung</string>
+    <string name="saving">Speichern...</string>
+    <string name="saving_failed">Speichern fehlgeschlagen.</string>
+    <string name="saving_done">Erfolgreich gespeichert.</string>
+    <string name="searching_">Suchen...</string>
+    <string name="delete_warning">In dieser Version kann der Eintrag nicht geloescht werden</string>
+
+        <string name="definition_flypostr1">
+        Flyposter:
+    </string>
+    <string name="definition_flypostr2">
+        1. One who illegally posts flyers or similar material in public places.\n2. A flyer, poster, etc. that is illegal posted in a public place.
+    </string>
+    <string name="about_text">
+© itcc.li\n\n
+IT Crowd Club Liechtenstein\n
+Postfach 244 Vaduz\n
+Liechtenstein\n
+info@itcc.li\n
+\n
+created by:\n
+Alexander Mulkidzhanyan,
+Arthur Maxer,
+Bolaji Smith,
+Bruno Saboia de Albuquerque,
+Charlotte Wehking,
+Christoph Buehler,
+Egon Lampert,
+Erikas Sojunovas,
+Guido Forster,
+Kevin Flesher,
+Lena Kaiser,
+Livio Rinaldi,
+Luca Tescari,
+Patrik Marxer,
+Peter Matt,
+Philipp Gerber,
+Simon Meier,
+Thomas Elsensohn
+    </string>
+
+    <string name="my_location">Meine Position</string>
+    <string name="refreshing_">Aktualisieren...</string>
+    <string name="done">Fertig</string>
+    <string name="txt_select_picture">Bild auswählen</string>
+    <string name="txt_input_missing">Eingabe fehlt</string>
+    <string name="txt_input_too_short">Eingabe zu kurz</string>
+    <string name="txt_input_too_long">Eingabe zu lang</string>
+    <string name="txt_location_missing">Speichern nicht möglich, Ihr Standort konnte noch nicht lokalisiert werden.</string>
+    <string name="txt_your_location_gets_determined">Ihre Position wird ermittelt...</string>
+    <string name="txt_lat_long_precision">{0} N, {1} O\nGenauigkeit: {2} m</string>
+    <string name="txt_drag_me">Zieh mich</string>
+    <string name="txt_drag_me_snippet">Genaue Position durch\nZiehen bestimmen</string>
+    <string name="txt_satellite">Satellit</string>
+    <string name="txt_my_location">Meine Position</string>
+
+</resources>
