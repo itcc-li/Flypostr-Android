@@ -69,6 +69,18 @@ Thomas Elsensohn
     <string name="txt_drag_me_snippet">Define exact location\nby dragging</string>
     <string name="txt_satellite">Satellit</string>
     <string name="txt_my_location">Meine Position</string>
+    <string name="loading">Loading…</string>
+
+    <string name="google_status_fmt">Google User: %s</string>
+    <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="google_title_text">Google Sign In</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>
+
+
+
 
 
 </resources>

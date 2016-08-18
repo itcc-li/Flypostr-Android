@@ -1,5 +1,7 @@
 package li.itcc.flypostr;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -141,6 +143,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void setTitleId(int titleId) {
         mTitleId = titleId;
+    }
+
+
+    public static Intent createIntent(Context context) {
+        Intent in = new Intent();
+        in.setClass(context, MainActivity.class);
+        return in;
     }
 
     /**
