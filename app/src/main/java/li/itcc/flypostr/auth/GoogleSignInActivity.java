@@ -52,6 +52,7 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
+    private static final boolean START_MAIN_ACTIVITY = true;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -70,9 +71,10 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
         super.onCreate(savedInstanceState);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            startActivity(MainActivity.createIntent(this));
-            finish();
-            return;
+            if (START_MAIN_ACTIVITY) {
+                startMainAndFinish();
+                return;
+            }
         }
         setContentView(R.layout.activity_google_sign_in);
 
@@ -108,8 +110,9 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    startActivity(MainActivity.createIntent(GoogleSignInActivity.this));
-                    finish();
+                    if (START_MAIN_ACTIVITY) {
+                        startMainAndFinish();
+                    }
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -120,6 +123,11 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
             }
         };
         // [END auth_state_listener]
+    }
+
+    private void startMainAndFinish() {
+        startActivity(MainActivity.createIntent(this));
+        finish();
     }
 
     // [START on_start_add_listener]
