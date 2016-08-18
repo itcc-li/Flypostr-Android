@@ -49,6 +49,7 @@ import li.itcc.flypostr.util.ThumbnailCache;
 
 /**
  * Created by Arthur on 12.09.2015.
+ *
  */
 public class PoiMapFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
