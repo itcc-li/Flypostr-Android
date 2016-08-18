@@ -45,6 +45,7 @@ import li.itcc.flypostr.R;
 
 /**
  * Original code @ https://github.com/firebase/quickstart-android
+ *
  */
 public class GoogleSignInActivity extends ProgressDialogActivity implements
         GoogleApiClient.OnConnectionFailedListener,
