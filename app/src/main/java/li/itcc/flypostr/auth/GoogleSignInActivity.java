@@ -40,6 +40,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import li.itcc.flypostr.MainActivity;
 import li.itcc.flypostr.R;
 
 /**
@@ -67,6 +68,12 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            startActivity(MainActivity.createIntent(this));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_google_sign_in);
 
         // Views
@@ -91,9 +98,7 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
-        // [END initialize_auth]
 
         // [START auth_state_listener]
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -103,6 +108,8 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    startActivity(MainActivity.createIntent(GoogleSignInActivity.this));
+                    finish();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
