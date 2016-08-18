@@ -63,12 +63,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // latest version see http://developer.android.com/tools/support-library/index.html#revisions
-    // see https://developers.google.com/android/guides/setup
     //compile 'com.google.android.gms:play-services-identity:7.8.0'
     //compile 'com.google.android.gms:play-services-plus:7.8.0'
     //compile project(path: '', configuration: 'android-endpoints')
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:design:24.1.1'
+
+    // see https://developer.android.com/topic/libraries/support-library/features.html
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
+    // see https://developers.google.com/android/guides/setup
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.google.android.gms:play-services:9.4.0'
@@ -77,6 +79,8 @@ dependencies {
     // for firebase authentication:
     compile 'com.google.firebase:firebase-auth:9.4.0'
     compile 'com.google.android.gms:play-services-auth:9.4.0'
+    // for geofire
+    compile 'com.firebase:geofire-android:2.0.0'
 }
 
 
