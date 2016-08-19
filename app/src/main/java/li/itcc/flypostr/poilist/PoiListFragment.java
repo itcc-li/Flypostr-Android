@@ -1,21 +1,14 @@
 package li.itcc.flypostr.poilist;
 
-import java.text.DecimalFormat;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,22 +21,21 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.RuntimeExecutionException;
+
+import java.text.DecimalFormat;
 
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
-import li.itcc.flypostr.backend.PoiOverviewListBean;
-import li.itcc.flypostr.database.DatabaseContract;
-import li.itcc.flypostr.database.tables.PoiOverviewTable;
 import li.itcc.flypostr.poiadd.PoiAddOnClickListener;
 import li.itcc.flypostr.poidetail.PoiDetailActivity;
-import li.itcc.flypostr.util.ExceptionHandler;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, PoiListLoader.PoiListLoaderListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class PoiListFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private DecimalFormat FORMAT_0 = new DecimalFormat("#,##0");
     private DecimalFormat FORMAT_1 = new DecimalFormat("#,##0.0");
     private PoiCursorAdapter fDataAdapter;
@@ -73,7 +65,7 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
         fEmptyText = (TextView) rootView.findViewById(android.R.id.empty);
         fCreateButton = rootView.findViewById(R.id.viw_add_button);
         fCreateButton.setOnClickListener(new PoiAddOnClickListener(getActivity()));
-        fProgressBar = (ProgressBar)rootView.findViewById(R.id.prb_progress);
+        fProgressBar = (ProgressBar) rootView.findViewById(R.id.prb_progress);
         fProgressBar.setMax(100);
         fProgressBar.setVisibility(View.GONE);
         fDataAdapter = new PoiCursorAdapter(activity);
@@ -103,7 +95,7 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
         setHasOptionsMenu(true);
         // start loading
         buildGoogleApiClient();
-        getLoaderManager().initLoader(0, null, this);
+
     }
 
     @Override
@@ -121,8 +113,8 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     private void onListItemClick(int position, long id) {
-        Cursor c = (Cursor)fDataAdapter.getItem(position);
-        String poiId = c.getString(c.getColumnIndex(PoiOverviewTable.COL_ID));
+        Cursor c = (Cursor) fDataAdapter.getItem(position);
+        String poiId = ""; // TODO
         PoiDetailActivity.start(getActivity(), poiId);
     }
 
@@ -141,18 +133,6 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            fProgressBar.setVisibility(View.VISIBLE);
-            new PoiListLoader(getContext(), this).refresh();
-            return true;
-        }
-        else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
     private void updateTableVisibility() {
         if (fDataAdapter.getCount() == 0) {
             fEmptyText.setVisibility(View.VISIBLE);
@@ -161,49 +141,6 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
             fEmptyText.setVisibility(View.GONE);
             fListView.setVisibility(View.VISIBLE);
         }
-    }
-
-    // list refreshing
-
-    @Override
-    public void onTaskAborted(Throwable th) {
-        fProgressBar.setVisibility(View.GONE);
-        new ExceptionHandler(getActivity()).onTaskAborted(th);
-    }
-
-    @Override
-    public void onTaskCompleted(PoiOverviewListBean poiOverviewListBean) {
-        fProgressBar.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onTaskProgress(int percentage) {
-        fProgressBar.setProgress(percentage);
-    }
-
-    //// loader callbacks
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = null;
-        String where = null;
-        String[] whereArgs = null;
-        String sortOrder = null;
-        Uri queryUri = DatabaseContract.Pois.CONTENT_URI;
-        CursorLoader loader = new CursorLoader(getActivity(), queryUri, projection, where, whereArgs, sortOrder);
-        return loader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        fThumbnailCache.clearCache();
-        this.fDataAdapter.swapCursor(data);
-        updateTableVisibility();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        this.fDataAdapter.swapCursor(null);
     }
 
 
@@ -219,8 +156,13 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onConnected(Bundle bundle) {
-        Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(fGoogleApiClient);
-        setLocation(lastKnownLocation);
+        try {
+            Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(fGoogleApiClient);
+            setLocation(lastKnownLocation);
+        }
+        catch (SecurityException x) {
+            throw new RuntimeExecutionException(x);
+        }
     }
 
     @Override
@@ -234,8 +176,6 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     private class PoiCursorAdapter extends ResourceCursorAdapter {
-        private final String[] fColumnNames;
-        private final int[] fColumnIndices;
         private int POI_NAME_INDEX;
         private int POI_SHORT_DESCRIPTION;
         private int POI_LATITUDE_INDEX;
@@ -250,42 +190,24 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
             POI_LATITUDE_INDEX = count++;
             POI_LONGITUDE_INDEX = count++;
             POI_ID_INDEX = count++;
-            // Note: must be same order
-            fColumnNames = new String[]{PoiOverviewTable.COL_NAME, PoiOverviewTable.COL_SHORT_DESCRIPTION, PoiOverviewTable.COL_LATITUDE, PoiOverviewTable.COL_LONGITUDE, PoiOverviewTable.COL_ID};
-            fColumnIndices = new int[fColumnNames.length];
         }
 
 
-        @Override
-        public Cursor swapCursor(Cursor c) {
-            findColumns(c);
-            return super.swapCursor(c);
-        }
-
-
-        private void findColumns(Cursor c) {
-            if (c != null) {
-                int i;
-                for (i = 0; i < fColumnIndices.length; i++) {
-                    fColumnIndices[i] = c.getColumnIndexOrThrow(fColumnNames[i]);
-                }
-            }
-        }
-
+        // TODO
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             // name
             TextView name = (TextView) view.findViewById(R.id.txv_poi_name);
-            name.setText(cursor.getString(fColumnIndices[POI_NAME_INDEX]));
+            name.setText("");
             // short description
             TextView description = (TextView) view.findViewById(R.id.txv_description);
-            description.setText(cursor.getString(fColumnIndices[POI_SHORT_DESCRIPTION]));
+            description.setText("");
             // distance
             TextView distance = (TextView) view.findViewById(R.id.txv_poi_distance);
             if (fLocation != null) {
-                double latitude = cursor.getDouble(fColumnIndices[POI_LATITUDE_INDEX]);
-                double longitude = cursor.getDouble(fColumnIndices[POI_LONGITUDE_INDEX]);
+                double latitude = 10;
+                double longitude = 10;
                 Location pointLocation = new Location("");
                 pointLocation.setLatitude(latitude);
                 pointLocation.setLongitude(longitude);
@@ -302,9 +224,8 @@ public class PoiListFragment extends Fragment implements LoaderManager.LoaderCal
                 distance.setText("");
             }
             // thumb
-            String id = cursor.getString(fColumnIndices[POI_ID_INDEX]);
             ImageView imageView = (ImageView) view.findViewById(R.id.imv_thumbnail);
-            imageView.setImageBitmap(fThumbnailCache.getBitmap(id));
+            imageView.setImageBitmap(null); // TODO
         }
     }
 }

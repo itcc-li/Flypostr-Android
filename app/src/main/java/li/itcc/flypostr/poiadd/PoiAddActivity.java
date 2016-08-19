@@ -1,21 +1,12 @@
 package li.itcc.flypostr.poiadd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.UUID;
-
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -23,6 +14,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -36,17 +30,23 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.UUID;
+
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
-import li.itcc.flypostr.backend.PoiCreateBean;
 import li.itcc.flypostr.exactlocation.ExactLocationActivity;
-import li.itcc.flypostr.util.StreamUtil;
-import li.itcc.flypostr.util.ValidationHelper;
+
+import static li.itcc.flypostr.poimap.PoiMapFragment.PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
     private DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
     private static final String KEY_LOCATION = "KEY_LOCATION";
     private static final String KEY_EXACT_LOCATION = "KEY_EXACT_LOCATION";
@@ -131,10 +131,10 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
                 onExactLocationClick(v);
             }
         });
-        fLocationText = (TextView)findViewById(R.id.txv_location_text);
-        fName = (EditText)findViewById(R.id.etx_name);
-        fDescription = (EditText)findViewById(R.id.etx_description);
-        fImage = (ImageView)findViewById(R.id.img_image);
+        fLocationText = (TextView) findViewById(R.id.txv_location_text);
+        fName = (EditText) findViewById(R.id.etx_name);
+        fDescription = (EditText) findViewById(R.id.etx_description);
+        fImage = (ImageView) findViewById(R.id.img_image);
         buildGoogleApiClient();
         // restore state
         if (savedInstanceState != null) {
@@ -184,6 +184,21 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             return;
         }
         if (shouldBeRegistered) {
+            checkPermissionAndRegister(true);
+        }
+        else {
+            LocationServices.FusedLocationApi.removeLocationUpdates(fGoogleApiClient, this);
+            fIsRegistered = false;
+        }
+    }
+
+    private void checkPermissionAndRegister(boolean executeRequest) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (executeRequest) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+            }
+        }
+        else {
             LocationRequest locationRequest = new LocationRequest();
             locationRequest.setInterval(10000);
             locationRequest.setFastestInterval(5000);
@@ -191,10 +206,12 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             LocationServices.FusedLocationApi.requestLocationUpdates(fGoogleApiClient, locationRequest, this);
             fIsRegistered = true;
         }
-        else {
-            LocationServices.FusedLocationApi.removeLocationUpdates(fGoogleApiClient, this);
-            fIsRegistered = false;
-        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        checkPermissionAndRegister(false);
     }
 
     private synchronized void buildGoogleApiClient() {
@@ -299,12 +316,8 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
 
     private void onSaveClick(View v) {
         // validate input
-        ValidationHelper vh = new ValidationHelper(this);
-        String poiName = vh.validateText(fName, PoiConstants.POI_NAME_LENGTH_MIN, PoiConstants.POI_NAME_LENGTH_MAX);
-        String poiDescription = vh.validateText(fDescription, PoiConstants.POI_COMMENT_LENGTH_MAX);
-        if (vh.hasErrors()) {
-            return;
-        }
+        String poiName = fName.getText().toString();
+        String poiDescription = fDescription.getText().toString();
         if (fLocation == null) {
             Toast.makeText(this, R.string.txt_location_missing, Toast.LENGTH_LONG).show();
             return;
@@ -320,9 +333,11 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             detail.setExactLatitude(fExactLocation.getLatitude());
             detail.setExactLongitude(fExactLocation.getLongitude());
         }
-        LocalPoiSaver saver = new LocalPoiSaver(getApplicationContext());
+
+        // TODO:  save detail
+        //  LocalPoiSaver saver = new LocalPoiSaver(getApplicationContext());
         // fire and forget
-        saver.save(detail, fLocalImageFileCropped);
+        //saver.save(detail, fLocalImageFileCropped);
         finish();
     }
 
@@ -357,7 +372,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             try {
                 if (requestCode == REQUEST_GET_GALLERY_PICTURE) {
                     Uri selectedImageUri = data.getData();
-                    copyToLocalFile(selectedImageUri);
+                    //copyToLocalFile(selectedImageUri);
                     cropPicture();
                 }
                 else if (requestCode == REQUEST_TAKE_PICTURE) {
@@ -398,52 +413,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
         fClearPictureButton.setVisibility(removePictureButtonVisibility);
     }
 
-    public void copyToLocalFile(Uri uri) throws IOException {
-        boolean done = false;
-        if( uri != null ) {
-            // create local file
-            if (Uri.fromFile(fLocalImageFileOriginal).equals(uri)) {
-                return;
-            }
-            InputStream in = getContentResolver().openInputStream(uri);
-            long totalSize = 0;
-            if (in != null) {
-                totalSize = copyToOutput(in);
-            }
-            if (totalSize == 0L) {
-                // this might happen on older devices
-                // try to retrieve the image from the media store first
-                // this will only work for images selected from gallery
-                String[] projection = {MediaStore.Images.Media.DATA};
-                Cursor cursor = managedQuery(uri, projection, null, null, null);
-                if (cursor != null) {
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor.moveToFirst();
-                    String path = cursor.getString(column_index);
-                    if (path != null) {
-                        InputStream altIn = new FileInputStream(path);
-                        long length = copyToOutput(altIn);
-                        if (length > 0L) {
-                            done = true;
-                        }
-                    }
-                }
-            }
-            else {
-                done = true;
-            }
-        }
-        if (!done) {
-            fLocalImageFileOriginal.delete();
-        }
-    }
 
-    private long copyToOutput(InputStream in) throws IOException {
-        File outFile = fLocalImageFileOriginal;
-        FileOutputStream out = new FileOutputStream(outFile);
-        long totalSize = StreamUtil.pumpAllAndClose(in, out);
-        return totalSize;
-    }
 
     private void cropPicture() throws IOException {
         if (!fLocalImageFileOriginal.exists()) {

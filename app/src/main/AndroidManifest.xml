@@ -21,17 +21,19 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".auth.GoogleSignInActivity" android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
         </activity>
-        <activity android:name=".poiadd.PoiAddActivity"/>
+        <activity android:name=".poiadd.PoiAddActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+        </activity>
         <activity android:name=".poidetail.PoiDetailActivity"/>
         <activity android:name=".exactlocation.ExactLocationActivity"/>
 
@@ -39,11 +41,6 @@
             android:name=".database.PoiContentProvider"
             android:authorities="li.itcc.provider.flypostr"/>
 
-        <receiver android:name=".util.ConnectivityChangeReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
-        </receiver>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
