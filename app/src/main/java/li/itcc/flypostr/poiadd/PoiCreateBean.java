@@ -1,4 +1,4 @@
-package li.itcc.flypostr.backend;
+package li.itcc.flypostr.poiadd;
 
 /**
  * The object model for the data we are sending through endpoints

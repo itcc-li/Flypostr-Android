@@ -17,7 +17,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import li.itcc.flypostr.R;
-import li.itcc.flypostr.backend.PoiDetailBean;
 import li.itcc.flypostr.backend.PoiOverviewBean;
 
 /**

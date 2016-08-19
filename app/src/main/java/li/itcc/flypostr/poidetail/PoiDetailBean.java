@@ -1,4 +1,6 @@
-package li.itcc.flypostr.backend;
+package li.itcc.flypostr.poidetail;
+
+import li.itcc.flypostr.backend.PoiOverviewBean;
 
 /**
  * The object model for the data we are sending through endpoints

@@ -107,7 +107,7 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
         double latitude = fLocation.getLatitude();
         double longitude = fLocation.getLongitude();
         // we add 10%
-        double radius = (double)PoiConstants.FINE_LOCATION_MAX_RADIUS * 1.1;
+        double radius = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS * 1.1;
         double deltaLatitude = Math.toDegrees(radius / (double)PoiConstants.EARTH_RADIUS_IN_METER);
         double cosLat = Math.cos(Math.toRadians(latitude));
         if (cosLat < 0.01) {

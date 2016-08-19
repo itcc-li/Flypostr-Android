@@ -1,6 +1,8 @@
-package li.itcc.flypostr.backend;
+package li.itcc.flypostr.poilist;
 
 import java.util.List;
+
+import li.itcc.flypostr.backend.PoiOverviewBean;
 
 /**
  * The object model for the data we are sending through endpoints
