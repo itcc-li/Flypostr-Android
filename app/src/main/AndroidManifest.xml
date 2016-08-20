@@ -34,7 +34,7 @@
         <activity android:name=".poiadd.PoiAddActivity">
 
         </activity>
-        <activity android:name=".poidetail.PoiDetailActivity"/>
+        <activity android:name=".posting.PostingDetailActivity"/>
         <activity android:name=".exactlocation.ExactLocationActivity"/>
 
         <!--

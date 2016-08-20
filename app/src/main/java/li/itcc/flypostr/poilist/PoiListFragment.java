@@ -28,7 +28,7 @@ import java.text.DecimalFormat;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
 import li.itcc.flypostr.poiadd.PoiAddOnClickListener;
-import li.itcc.flypostr.poidetail.PoiDetailActivity;
+import li.itcc.flypostr.posting.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 
@@ -115,7 +115,7 @@ public class PoiListFragment extends Fragment implements GoogleApiClient.Connect
     private void onListItemClick(int position, long id) {
         Cursor c = (Cursor) fDataAdapter.getItem(position);
         String poiId = ""; // TODO
-        PoiDetailActivity.start(getActivity(), poiId);
+        PostingDetailActivity.start(getActivity(), poiId);
     }
 
     private synchronized void buildGoogleApiClient() {
