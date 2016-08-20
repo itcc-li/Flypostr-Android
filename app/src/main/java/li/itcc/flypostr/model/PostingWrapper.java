@@ -15,6 +15,10 @@ public class PostingWrapper {
         this(new PostingBean());
     }
 
+    public PostingBean getBean() {
+        return bean;
+    }
+
     public PostingWrapper(PostingBean bean) {
         this.bean = bean;
     }

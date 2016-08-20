@@ -1,4 +1,4 @@
-package li.itcc.flypostr.poiadd;
+package li.itcc.flypostr.postingAdd;
 
 import android.app.Activity;
 import android.view.View;
@@ -6,15 +6,15 @@ import android.view.View;
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiAddOnClickListener implements View.OnClickListener {
+public class PostingAddOnClickListener implements View.OnClickListener {
     private final Activity fParent;
 
-    public PoiAddOnClickListener(Activity parent) {
+    public PostingAddOnClickListener(Activity parent) {
         fParent = parent;
     }
 
     @Override
     public void onClick(View v) {
-        PoiAddActivity.start(fParent);
+        PostingAddActivity.start(fParent);
     }
 }

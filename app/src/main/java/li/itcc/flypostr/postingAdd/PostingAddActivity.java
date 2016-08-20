@@ -1,4 +1,4 @@
-package li.itcc.flypostr.poiadd;
+package li.itcc.flypostr.postingAdd;
 
 import android.Manifest;
 import android.app.Activity;
@@ -43,14 +43,13 @@ import java.util.List;
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.exactlocation.ExactLocationActivity;
-import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
+public class PostingAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
     private static final int OPEN_GALERY = 1;
     private static final int OPEN_CAMERA = 2;
     private static DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
@@ -83,7 +82,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
     private View fExactLocationButton;
 
     public static void start(Activity parent) {
-        Intent i = new Intent(parent, PoiAddActivity.class);
+        Intent i = new Intent(parent, PostingAddActivity.class);
         parent.startActivityForResult(i, 0);
     }
 
