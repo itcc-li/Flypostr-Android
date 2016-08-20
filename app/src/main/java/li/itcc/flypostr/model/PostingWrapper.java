@@ -9,8 +9,8 @@ import li.itcc.flypostr.util.ParseHelper;
  */
 
 public class PostingWrapper {
+    private static final int SNIPPET_MAX_LENGTH = 50;
     private PostingBean bean;
-    private String fSnippet;
 
     public PostingWrapper() {
         this(new PostingBean());
@@ -21,6 +21,9 @@ public class PostingWrapper {
     }
 
     public PostingWrapper(PostingBean bean) {
+        if (bean == null) {
+            throw new NullPointerException();
+        }
         this.bean = bean;
     }
 
@@ -105,6 +108,13 @@ public class PostingWrapper {
     }
 
     public String getSnippet() {
-        return fSnippet;
+        String snippet = bean.text;
+        if (snippet == null || snippet.length() == 0) {
+            return null;
+        }
+        if (snippet.length() > SNIPPET_MAX_LENGTH) {
+            snippet = snippet.substring(0, SNIPPET_MAX_LENGTH - 3) + "...";
+        }
+        return snippet;
     }
 }
