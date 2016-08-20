@@ -1,4 +1,4 @@
-package li.itcc.flypostr.postingDetail;
+package li.itcc.flypostr.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,37 +15,44 @@ import java.io.File;
 /**
  * Created by sandro.pedrett on 20.08.2016.
  */
-public class PostingImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnapshot>, OnProgressListener<FileDownloadTask.TaskSnapshot> {
+public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnapshot>, OnProgressListener<FileDownloadTask.TaskSnapshot> {
     private final String pathToStorageFolder;
     private Context context;
-    private PostingImageLoaderCallback callback;
-    private File file;
+    private File tmpFile;
     private FileDownloadTask task;
+    private String filename;
+    private ImageLoaderCallback callback;
 
-    public interface PostingImageLoaderCallback {
-        void onImageReceived(Bitmap bitmap);
-        void onUpdateProgressDownload(long bytesReceived, long totalByteCount);
-        void onError(Throwable e);
+    public interface ImageLoaderCallback {
+        void onError(String filename, Throwable e);
+        void onImageLoaded(String filename, Bitmap bitmap);
+        void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount);
     }
 
-    public PostingImageLoader(Context context, String pathToStorageFolder) {
+    public ImageLoader(Context context, String pathToStorageFolder) {
         this.pathToStorageFolder = pathToStorageFolder;
         this.context = context;
     }
 
-    public void loadImage(String filename, PostingImageLoaderCallback callback) {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference(pathToStorageFolder);
+    public boolean cancel() {
+        detach();
+        return task.cancel();
+    }
+
+    public void startProgress(String filename, ImageLoaderCallback callback) {
         this.callback = callback;
+        this.filename = filename;
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference(pathToStorageFolder);
 
         try {
-            // TODO implement
-            file = new File(context.getCacheDir(), filename);
-            task = storageRef.child(filename).getFile(file);
+            // create tmpFile to this path
+            tmpFile = new File(context.getCacheDir(), filename);
+            task = storageRef.child(filename).getFile(tmpFile);
 
             task.addOnSuccessListener(this);
             task.addOnProgressListener(this);
         } catch (Exception e) {
-            callback.onError(e);
+            callback.onError(filename, e);
         }
     }
 
@@ -58,14 +65,16 @@ public class PostingImageLoader implements OnSuccessListener<FileDownloadTask.Ta
 
     @Override
     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-        Bitmap image = BitmapFactory.decodeFile(file.getAbsolutePath());
-        callback.onImageReceived(image);
+        Bitmap image = BitmapFactory.decodeFile(tmpFile.getAbsolutePath());
+
+        callback.onImageLoaded(filename, image);
     }
 
     @Override
     public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
         long totalByteCount = taskSnapshot.getTotalByteCount();
         long bytesTransferred = taskSnapshot.getBytesTransferred();
-        callback.onUpdateProgressDownload(bytesTransferred, totalByteCount);
+
+        callback.onUpdateProgressDownload(filename, bytesTransferred, totalByteCount);
     }
 }
