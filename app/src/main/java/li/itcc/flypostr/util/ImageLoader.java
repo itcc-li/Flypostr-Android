@@ -24,7 +24,7 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     private ImageLoaderCallback callback;
 
     public interface ImageLoaderCallback {
-        void onError(String filename, Throwable e);
+        void onError(Throwable e);
         void onImageLoaded(String filename, Bitmap bitmap);
         void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount);
     }
@@ -52,7 +52,7 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
             task.addOnSuccessListener(this);
             task.addOnProgressListener(this);
         } catch (Exception e) {
-            callback.onError(filename, e);
+            callback.onError(e);
         }
     }
 
