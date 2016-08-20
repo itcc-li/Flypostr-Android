@@ -3,6 +3,7 @@ package li.itcc.flypostr.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.InputMismatchException;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
@@ -40,7 +41,19 @@ public final class ParseHelper {
         return Integer.parseInt(integer);
     }
 
-    public static String convertToString(int integer) {
+    public static Integer convertToInteger(Long number) {
+        if (number == null) {
+            return null;
+        }
+
+        return number.intValue();
+    }
+
+    public static String convertToString(Integer integer) {
+        if (integer == null) {
+            return null;
+        }
+
         return Integer.toString(integer);
     }
 
@@ -50,5 +63,21 @@ public final class ParseHelper {
 
     public static String convertToString(Double number) {
         return Double.toString(number);
+    }
+
+    public static Long convertToLong(Integer number) {
+        if (number == null) {
+            return null;
+        }
+
+        return Long.valueOf(number);
+    }
+
+    public static String convertToString(Long number) {
+        if (number == null) {
+            return null;
+        }
+
+        return number.toString();
     }
 }

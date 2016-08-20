@@ -28,7 +28,7 @@ import java.text.DecimalFormat;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
 import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
-import li.itcc.flypostr.posting.PostingDetailActivity;
+import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 

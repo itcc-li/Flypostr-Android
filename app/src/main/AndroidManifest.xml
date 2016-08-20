@@ -20,22 +20,28 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".auth.GoogleSignInActivity" android:label="@string/app_name">
+        <activity android:name=".auth.ChooserActivity" android:label="@string/title_activity_login">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+              <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+              <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
-        </activity>
-        <activity android:name=".postingAdd.PostingAddActivity">
-
-        </activity>
-        <activity android:name=".posting.PostingDetailActivity"/>
+        <activity android:name=".auth.GoogleSignInActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.AnonymousAuthActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.CustomAuthActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.FacebookLoginActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.TwitterLoginActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.EmailPasswordActivity" android:label="@string/app_name" />
+        <activity android:name=".auth.ProgressDialogActivity" android:label="@string/app_name" />
+        <activity android:name=".MainActivity" android:label="@string/app_name" />
+        <activity android:name=".postingAdd.PostingAddActivity" />
+        <activity android:name=".postingDetail.PostingDetailActivity"/>
         <activity android:name=".exactlocation.ExactLocationActivity"/>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -47,8 +53,11 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
+            android:value="@string/google_maps_key" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="9e3a9da9afed8d416e4e0a2241bf7d45fa5dc7cc" />
 
     </application>
-
 </manifest>

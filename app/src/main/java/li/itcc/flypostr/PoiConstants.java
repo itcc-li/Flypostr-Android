@@ -10,6 +10,5 @@ public class PoiConstants {
 
     public static final String ROOT_GEOFIRE = "geofire";
     public static final String ROOT_POSTINGS = "postings";
-
-
+    public static final String ROOT_IMAGES_STORAGE = "images";
 }

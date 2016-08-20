@@ -1,12 +1,26 @@
 apply plugin: 'com.android.application'
 
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/repo' }
+    }
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+repositories {
+    maven { url 'https://maven.fabric.io/repo' }
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "li.itcc.flypostr"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -53,7 +67,6 @@ android {
         }
     }
 
-
     lintOptions {
         abortOnError false
     }
@@ -62,10 +75,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // latest version see http://developer.android.com/tools/support-library/index.html#revisions
-    //compile 'com.google.android.gms:play-services-identity:7.8.0'
-    //compile 'com.google.android.gms:play-services-plus:7.8.0'
-    //compile project(path: '', configuration: 'android-endpoints')
 
     // see https://developer.android.com/topic/libraries/support-library/features.html
     compile 'com.android.support:appcompat-v7:23.0.1'
@@ -73,7 +82,6 @@ dependencies {
     // see https://developers.google.com/android/guides/setup
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
-    compile 'com.google.android.gms:play-services:9.4.0'
     compile 'com.google.firebase:firebase-core:9.4.0'
 
     // for firebase authentication:
@@ -81,6 +89,16 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.4.0'
     // for geofire
     compile 'com.firebase:geofire-android:2.0.0'
+
+    // Facebook Android SDK
+    compile 'com.facebook.android:facebook-android-sdk:4.14.1'
+
+    ////Twitter Android SDK
+    compile('com.twitter.sdk.android:twitter:2.0.0@aar') {
+        transitive = true
+    }
+    // for realtime database
+    compile 'com.google.firebase:firebase-database:9.4.0'
     // for the images
     compile 'com.google.firebase:firebase-storage:9.4.0'
 }
