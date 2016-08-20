@@ -128,5 +128,9 @@ Thomas Elsensohn
 
     <string name="title_activity_login">Login</string>
 
+    <string name="sign_out_message">You are signed out</string>
+
+    <string name="sign_out">Signout</string>
+
 
 </resources>

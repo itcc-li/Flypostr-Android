@@ -19,7 +19,9 @@ package li.itcc.flypostr.auth;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import li.itcc.flypostr.MainActivity;
 import li.itcc.flypostr.R;
 
 /**
@@ -42,6 +49,9 @@ import li.itcc.flypostr.R;
  */
 public class ChooserActivity extends AppCompatActivity  implements AdapterView.OnItemClickListener {
 
+    private static final String TAG = "Chooser";
+    private static final boolean START_MAIN_ACTIVITY = true;
+
     private static final Class[] CLASSES = new Class[]{
             GoogleSignInActivity.class,
             FacebookLoginActivity.class,
@@ -50,6 +60,32 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
             AnonymousAuthActivity.class,
             CustomAuthActivity.class
     };
+
+    // [START declare_auth]
+    private FirebaseAuth mAuth;
+    // [END declare_auth]
+
+    // [START declare_auth_listener]
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    // [END declare_auth_listener]
+
+    // [START on_start_add_listener]
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+    // [END on_start_add_listener]
+
+    // [START on_stop_remove_listener]
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+    // [END on_stop_remove_listener]
 
     private static final int[] DESCRIPTION_IDS = new int[] {
             R.string.desc_google_sign_in,
@@ -60,13 +96,57 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
             R.string.desc_custom_auth,
     };
 
+    private void startMainAndFinish() {
+        startActivity(MainActivity.createIntent(this));
+        finish();
+    }
+
+    public static Intent createIntent(Context context) {
+        Intent in = new Intent();
+        in.setClass(context, ChooserActivity.class);
+        return in;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            if (START_MAIN_ACTIVITY) {
+                startMainAndFinish();
+                return;
+            }
+        }
+
         setContentView(R.layout.activity_chooser);
+
+        // [START initialize_auth]
+        mAuth = FirebaseAuth.getInstance();
+        // [END initialize_auth]
+
+        // [START auth_state_listener]
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    if (START_MAIN_ACTIVITY) {
+                        startMainAndFinish();
+                    }
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+            }
+        };
+        // [END auth_state_listener]
 
         // Set up ListView and Adapter
         ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setBackgroundResource(R.drawable.custom);
 
         MyArrayAdapter adapter = new MyArrayAdapter(this, android.R.layout.simple_list_item_2, CLASSES);
         adapter.setDescriptionIds(DESCRIPTION_IDS);
