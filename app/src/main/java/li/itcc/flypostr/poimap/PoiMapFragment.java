@@ -53,7 +53,7 @@ import li.itcc.flypostr.util.ThumbnailCache;
  */
 public class PoiMapFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
-    public static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
+    private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private GoogleMap fGoogleMap;
     private HashMap<String, Marker> fIdToMarker = new HashMap<>();
     private HashMap<Marker, String> fMarkerToId = new HashMap<>();
@@ -69,7 +69,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geoLocation");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire");
         fGeoFire = new GeoFire(ref);
     }
 

@@ -81,6 +81,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.4.0'
     // for geofire
     compile 'com.firebase:geofire-android:2.0.0'
+    // for the images
+    compile 'com.google.firebase:firebase-storage:9.4.0'
 }
 
 
