@@ -1,25 +1,22 @@
 package li.itcc.flypostr.model;
 
-import java.util.Date;
-
 /**
  * Created by sandro.pedrett on 20.08.2016.
  */
 
-public final class PostingBean {
+public class PostingBean {
     private String authorId;
     private String title;
     private String text;
     private String imageId;
-    private Date createdAt;
-    private Date modifiedAt;
-    private Integer viewCount;
-    private Integer commentCount;
+    private String createdAt;
+    private String modifiedAt;
+    private String viewCount;
+    private String commentCount;
     private Double lat;
     private Double lng;
 
     public PostingBean() {
-
     }
 
     public String getAuthorId() {
@@ -54,39 +51,39 @@ public final class PostingBean {
         this.imageId = imageId;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getModifiedAt() {
+    public String getModifiedAt() {
         return modifiedAt;
     }
 
-    public void setModifiedAt(Date modifiedAt) {
+    public void setModifiedAt(String modifiedAt) {
         this.modifiedAt = modifiedAt;
     }
 
-    public Integer getViewCount() {
+    public String getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(Integer viewCount) {
+    public void setViewCount(String viewCount) {
         this.viewCount = viewCount;
     }
 
-    public Integer getCommentCount() {
+    public String getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(Integer commentCount) {
+    public void setCommentCount(String commentCount) {
         this.commentCount = commentCount;
     }
 
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
 

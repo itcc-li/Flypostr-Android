@@ -44,7 +44,7 @@ import java.util.HashMap;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
 import li.itcc.flypostr.poiadd.PoiAddOnClickListener;
-import li.itcc.flypostr.poidetail.PoiDetailActivity;
+import li.itcc.flypostr.posting.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 /**
@@ -69,7 +69,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geoLocation");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire");
         fGeoFire = new GeoFire(ref);
     }
 
@@ -238,7 +238,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     private boolean onClick(Marker marker) {
         String id = fMarkerToId.get(marker);
         if (id != null) {
-            PoiDetailActivity.start(getActivity(), id);
+            PostingDetailActivity.start(getActivity(), id);
         }
         return true;
     }

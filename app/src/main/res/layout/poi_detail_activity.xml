@@ -37,7 +37,7 @@
                 android:layout_gravity="center_horizontal" />
 
             <TextView
-                android:id="@+id/txv_name"
+                android:id="@+id/txv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="25sp"
@@ -46,7 +46,7 @@
                 />
 
             <TextView
-                android:id="@+id/txv_description"
+                android:id="@+id/txv_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
