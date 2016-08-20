@@ -6,11 +6,13 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +33,7 @@ public class ImageCache {
      * Create a new file cache thumbnail.
      * @param context of application
      */
-    public ImageCache(Context context, String rootPath) {
+    public ImageCache(Context context, String rootPath, int keepFileCounter) {
         this.context = context;
         this.rootPath = rootPath;
 
@@ -40,7 +42,38 @@ public class ImageCache {
         if (!this.cachDir.exists()) {
             this.cachDir.mkdirs();
         } else {
-            // todo cleanup old cache
+            if (keepFileCounter > 0) {
+                cleanup(keepFileCounter);
+            }
+        }
+    }
+
+    public void cleanup(int keepFilesCount) {
+        File[] files = cachDir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        });
+
+        if (files != null && files.length > keepFilesCount) {
+            Arrays.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    long delta = rhs.lastModified() - lhs.lastModified();
+                    if (delta < 0) {
+                        return -1;
+                    } else if (delta == 0) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
+
+            for (int i = keepFilesCount; i < files.length; i++) {
+                files[i].delete();
+            }
         }
     }
 

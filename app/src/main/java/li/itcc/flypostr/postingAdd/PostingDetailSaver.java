@@ -16,11 +16,15 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.model.PostingWrapper;
+import li.itcc.flypostr.util.ImageCache;
+import li.itcc.flypostr.util.StreamUtil;
 
 /**
  * Created by Arthur on 20.08.2016.
@@ -57,7 +61,11 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
             geoFire.setLocation(this.key, geoLoc);
         }
         // upload image
+        // TODO: set imageId after image and thumbnail are uploaded
         if (localImageFile != null) {
+            ImageCache cacheThumb = new ImageCache(context, PoiConstants.ROOT_THUMBNAIL_STORAGE, -1);
+            ImageCache cacheImage = new ImageCache(context, PoiConstants.ROOT_IMAGES_STORAGE, -1);
+
             // TODO: local caching of the image, e.g. with picasso
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             StorageReference imageFileRef = storageRef.child(PoiConstants.ROOT_IMAGES_STORAGE).child(imageID);
@@ -79,6 +87,18 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
             UploadTask thumbUploadTask = thumbRef.putFile(localThumbFileUrl);
             thumbUploadTask.addOnFailureListener(this).addOnSuccessListener(this);
 
+            File tmpThumb = cacheThumb.createTmpFile();
+            File tmpImage = cacheImage.createTmpFile();
+
+            try {
+                StreamUtil.pumpAllAndClose(new FileInputStream(localThumbFile), new FileOutputStream(tmpThumb));
+                cacheThumb.put(imageID, tmpThumb);
+
+                StreamUtil.pumpAllAndClose(new FileInputStream(localImageFile), new FileOutputStream(tmpImage));
+                cacheImage.put(imageID, tmpImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

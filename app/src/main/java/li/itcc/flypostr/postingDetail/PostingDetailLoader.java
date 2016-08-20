@@ -1,6 +1,7 @@
 package li.itcc.flypostr.postingDetail;
 
 import android.content.Context;
+import android.support.v4.app.LoaderManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

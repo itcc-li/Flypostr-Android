@@ -14,6 +14,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
+import li.itcc.flypostr.PoiConstants;
+
 /**
  * Created by sandro.pedrett on 20.08.2016.
  */
@@ -26,6 +28,10 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     private ImageLoaderCallback callback;
     private ImageCache cache;
 
+    public enum ImageCacheType {
+        THUMBNAILS,
+        IMAGES
+    }
 
     public interface ImageLoaderCallback {
         void onError(Throwable e);
@@ -33,10 +39,23 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
         void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount);
     }
 
-    public ImageLoader(Context context, String pathToStorageFolder) {
-        this.pathToStorageFolder = pathToStorageFolder;
+    public ImageLoader(Context context, ImageCacheType cacheType) {
+        int keepCacheFileCounter;
+        switch (cacheType) {
+            case IMAGES:
+                this.pathToStorageFolder = PoiConstants.ROOT_IMAGES_STORAGE;
+                keepCacheFileCounter = PoiConstants.KEEP_IMAGE_CACHE_IMAGES;
+                break;
+            case THUMBNAILS:
+                this.pathToStorageFolder = PoiConstants.ROOT_THUMBNAIL_STORAGE;
+                keepCacheFileCounter = PoiConstants.KEEP_IMAGE_CACHE_THUMBNAILS;
+                break;
+            default:
+                throw new RuntimeException();
+        }
+
         this.context = context;
-        cache = new ImageCache(context, pathToStorageFolder);
+        cache = new ImageCache(context, pathToStorageFolder, keepCacheFileCounter);
     }
 
     public boolean cancel() {

@@ -51,7 +51,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
             return;
         }
 
-        loadImageTask = new ImageLoader(this, PoiConstants.ROOT_IMAGES_STORAGE);
+        loadImageTask = new ImageLoader(this, ImageLoader.ImageCacheType.IMAGES);
         loadTask = new PostingDetailLoader(this);
 
         title = (TextView)findViewById(R.id.txv_title);

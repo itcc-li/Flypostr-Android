@@ -382,7 +382,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
                 // add the image to the marker
                 String imageId = bean.imageId;
                 if (imageId != null) {
-                    ImageLoader loader = new ImageLoader(getContext(), PoiConstants.ROOT_THUMBNAIL_STORAGE);
+                    ImageLoader loader = new ImageLoader(getContext(), ImageLoader.ImageCacheType.THUMBNAILS);
                     ImageDataListener listener = new ImageDataListener(markerWrapper);
                     loader.startProgress(imageId, listener);
                     markerWrapper.imageLoader = loader;
