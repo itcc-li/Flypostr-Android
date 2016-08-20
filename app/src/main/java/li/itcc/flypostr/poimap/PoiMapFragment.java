@@ -50,7 +50,7 @@ import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
-import li.itcc.flypostr.util.ThumbnailCache;
+import li.itcc.flypostr.util.ImageLoader;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -349,6 +349,9 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
             fMarkerToMakerWrapper.remove(markerWrapper.marker);
             markerWrapper.marker.remove();
             markerWrapper.postingRef.removeEventListener(this.postingListener);
+            if (markerWrapper.imageLoader != null) {
+                markerWrapper.imageLoader.detach();
+            }
         }
     }
 
@@ -375,6 +378,15 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
                 PostingWrapper postingWrapper = new PostingWrapper(bean);
                 markerWrapper.marker.setTitle(postingWrapper.getTitle());
                 markerWrapper.marker.setSnippet(postingWrapper.getSnippet());
+                // add thumbnail
+                // add the image to the marker
+                String imageId = bean.imageId;
+                if (imageId != null) {
+                    ImageLoader loader = new ImageLoader(getContext(), PoiConstants.ROOT_THUMBNAIL_STORAGE);
+                    ImageDataListener listener = new ImageDataListener(markerWrapper);
+                    loader.startProgress(imageId, listener);
+                    markerWrapper.imageLoader = loader;
+                }
             }
             else {
                 // delete
@@ -387,11 +399,34 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
         }
     }
 
+    private class ImageDataListener implements  ImageLoader.ImageLoaderCallback {
+        private final MarkerWrapper markerWrapper;
+
+        public ImageDataListener(MarkerWrapper markerWrapper) {
+            this.markerWrapper = markerWrapper;
+        }
+
+        @Override
+        public void onError(Throwable e) {
+        }
+
+        @Override
+        public void onImageLoaded(String filename, Bitmap bitmap) {
+            markerWrapper.bitmap = bitmap;
+        }
+
+        @Override
+        public void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount) {
+        }
+    }
+
 
     private static class MarkerWrapper {
         private Marker marker;
         private String postingID;
         public DatabaseReference postingRef;
+        public ImageLoader imageLoader;
+        public Bitmap bitmap;
 
         public MarkerWrapper(Marker marker, String postingID) {
             this.marker = marker;
@@ -401,14 +436,12 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     }
 
      public class PoiInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-        private ThumbnailCache fCache;
         private View fView;
         private ImageView fImage;
         private TextView fName;
         private TextView fDescription;
 
         public PoiInfoWindowAdapter() {
-            fCache = new ThumbnailCache(getContext());
         }
 
         @Override
@@ -422,7 +455,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
             if (markerWrapper == null) {
                 return null;
             }
-            Bitmap bitmap = fCache.getBitmap(markerWrapper.postingID);
+            Bitmap bitmap = markerWrapper.bitmap;
             if (fView == null) {
                 fView = getLayoutInflater(null).inflate(R.layout.map_info_window, null);
                 fImage = (ImageView)fView.findViewById(R.id.imv_thumbnail);
