@@ -16,6 +16,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 import li.itcc.flypostr.PoiConstants;
@@ -59,10 +60,25 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
         if (localImageFile != null) {
             // TODO: local caching of the image, e.g. with picasso
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            StorageReference fileRef = storageRef.child("images").child(imageID);
+            StorageReference imageFileRef = storageRef.child(PoiConstants.ROOT_IMAGES_STORAGE).child(imageID);
             Uri fileUrl = Uri.fromFile(localImageFile);
-            UploadTask fileUploadTask = fileRef.putFile(fileUrl);
-            fileUploadTask.addOnFailureListener(this).addOnSuccessListener(this);
+            UploadTask imageUploadTask = imageFileRef.putFile(fileUrl);
+            imageUploadTask.addOnFailureListener(this).addOnSuccessListener(this);
+            // add the thumbnail
+            // TODO: do in dedicated Task, not on UI thread
+            File localThumbFile = new File(localImageFile.getParentFile(), "thumb_" + localImageFile.getName());
+            SquareImageCropper cropper = new SquareImageCropper(this.context, localThumbFile, 128);
+            try {
+                cropper.crop(localImageFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            StorageReference thumbRef = storageRef.child(PoiConstants.ROOT_THUMBNAIL_STORAGE).child(imageID);
+            Uri localThumbFileUrl = Uri.fromFile(localThumbFile);
+            UploadTask thumbUploadTask = thumbRef.putFile(localThumbFileUrl);
+            thumbUploadTask.addOnFailureListener(this).addOnSuccessListener(this);
+
         }
     }
 

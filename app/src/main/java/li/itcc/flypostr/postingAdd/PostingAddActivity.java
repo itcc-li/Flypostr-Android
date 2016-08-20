@@ -330,7 +330,6 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
 
     private void onTakePictureClick(View v) {
         checkExternalStoragePermission(OPEN_CAMERA, true);
-        takePicture();
     }
 
     private void checkExternalStoragePermission(int medium, boolean executeRequest) {
