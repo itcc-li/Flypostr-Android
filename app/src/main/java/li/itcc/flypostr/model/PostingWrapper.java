@@ -8,13 +8,15 @@ import li.itcc.flypostr.util.ParseHelper;
  * Created by sandro.pedrett on 20.08.2016.
  */
 
-public class PostingWrapper extends Wrapper<PostingBean> {
-    public PostingWrapper() {
+public class PostingWrapper {
+    private PostingBean bean;
 
+    public PostingWrapper() {
+        this(new PostingBean());
     }
 
     public PostingWrapper(PostingBean bean) {
-        super(bean);
+        this.bean = bean;
     }
 
     public String getAuthorId() {

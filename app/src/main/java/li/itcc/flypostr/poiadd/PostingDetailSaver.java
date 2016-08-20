@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.UUID;
 
 import li.itcc.flypostr.model.PostingBean;
+import li.itcc.flypostr.model.PostingWrapper;
 
 /**
  * Created by Arthur on 20.08.2016.
@@ -27,7 +28,7 @@ public class PostingDetailSaver {
         fContext = context;
     }
 
-    public void save(PostingBean detail, File localImageFile) {
+    public void save(PostingWrapper detail, File localImageFile) {
         // TODO: local caching of the image, e.g. with picasso
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String fileName = UUID.randomUUID().toString() + ".jpg";

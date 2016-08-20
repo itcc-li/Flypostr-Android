@@ -44,6 +44,7 @@ import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.exactlocation.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingBean;
+import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
 
 /**
@@ -372,7 +373,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             return;
         }
         // validation is o.k., create new bean
-        PostingBean detail = new PostingBean();
+        PostingWrapper detail = new PostingWrapper();
         detail.setTitle(title);
         detail.setText(text);
         detail.setLat(fLocation.getLatitude());
