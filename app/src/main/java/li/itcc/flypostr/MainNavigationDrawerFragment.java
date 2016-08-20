@@ -21,8 +21,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import li.itcc.flypostr.R;
-
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -106,6 +104,7 @@ public class MainNavigationDrawerFragment extends Fragment {
                         getString(R.string.title_poi_list),
                         getString(R.string.title_overview_map),
                         getString(R.string.title_section3),
+                        getString(R.string.sign_out),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
