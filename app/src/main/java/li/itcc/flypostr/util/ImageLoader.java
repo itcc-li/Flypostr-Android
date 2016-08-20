@@ -3,7 +3,9 @@ package li.itcc.flypostr.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -15,13 +17,15 @@ import java.io.File;
 /**
  * Created by sandro.pedrett on 20.08.2016.
  */
-public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnapshot>, OnProgressListener<FileDownloadTask.TaskSnapshot> {
+public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnapshot>, OnProgressListener<FileDownloadTask.TaskSnapshot>, OnFailureListener {
     private final String pathToStorageFolder;
     private Context context;
     private File tmpFile;
     private FileDownloadTask task;
     private String filename;
     private ImageLoaderCallback callback;
+    private ImageCache cache;
+
 
     public interface ImageLoaderCallback {
         void onError(Throwable e);
@@ -32,6 +36,7 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     public ImageLoader(Context context, String pathToStorageFolder) {
         this.pathToStorageFolder = pathToStorageFolder;
         this.context = context;
+        cache = new ImageCache(context, pathToStorageFolder);
     }
 
     public boolean cancel() {
@@ -42,18 +47,27 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     public void startProgress(String filename, ImageLoaderCallback callback) {
         this.callback = callback;
         this.filename = filename;
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference(pathToStorageFolder);
 
-        try {
-            // create tmpFile to this path
-            tmpFile = new File(context.getCacheDir(), filename);
-            task = storageRef.child(filename).getFile(tmpFile);
+        Bitmap result = cache.getBitmap(filename);
 
-            task.addOnSuccessListener(this);
-            task.addOnProgressListener(this);
-        } catch (Exception e) {
-            callback.onError(e);
+        if (result != null) {
+            callback.onImageLoaded(filename, result);
+        } else {
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference(pathToStorageFolder);
+
+            try {
+                // create tmpFile to this path
+                tmpFile = cache.createTmpFile();
+                task = storageRef.child(filename).getFile(tmpFile);
+
+                task.addOnSuccessListener(this);
+                task.addOnProgressListener(this);
+                task.addOnFailureListener(this);
+            } catch (Exception e) {
+                callback.onError(e);
+            }
         }
+
     }
 
     public void detach() {
@@ -64,9 +78,14 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     }
 
     @Override
-    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-        Bitmap image = BitmapFactory.decodeFile(tmpFile.getAbsolutePath());
+    public void onFailure(@NonNull Exception e) {
+        callback.onError(e);
+    }
 
+    @Override
+    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+        File destFile = cache.put(filename, tmpFile);
+        Bitmap image = BitmapFactory.decodeFile(destFile.getAbsolutePath());
         callback.onImageLoaded(filename, image);
     }
 
