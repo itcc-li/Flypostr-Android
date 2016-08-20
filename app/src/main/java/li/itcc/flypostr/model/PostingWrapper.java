@@ -10,6 +10,7 @@ import li.itcc.flypostr.util.ParseHelper;
 
 public class PostingWrapper {
     private PostingBean bean;
+    private String fSnippet;
 
     public PostingWrapper() {
         this(new PostingBean());
@@ -101,5 +102,9 @@ public class PostingWrapper {
 
     public void setLng(Double lng) {
         bean.setLng(lng);
+    }
+
+    public String getSnippet() {
+        return fSnippet;
     }
 }

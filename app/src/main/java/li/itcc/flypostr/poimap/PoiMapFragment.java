@@ -35,17 +35,21 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
-import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
+import li.itcc.flypostr.model.PostingBean;
+import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.posting.PostingDetailActivity;
+import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 /**
@@ -56,8 +60,8 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
     private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private GoogleMap fGoogleMap;
-    private HashMap<String, Marker> fIdToMarker = new HashMap<>();
-    private HashMap<Marker, String> fMarkerToId = new HashMap<>();
+    private HashMap<String, MarkerWrapper> fIdToMarkerWrapper = new HashMap<>();
+    private HashMap<Marker, MarkerWrapper> fMarkerToMakerWrapper = new HashMap<>();
     private View fCreateButton;
     private Location fLocation;
     private boolean fLocationZoomDone = false;
@@ -65,12 +69,17 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     private GeoFire fGeoFire;
     private GeoQuery fGeoQuery;
     private GeoQueryEventListener fGeoQueryEventListener;
+    private DatabaseReference postingListRef;
+    private PostingDataListener postingListener;
+    private boolean fIsStarted;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
+        this.postingListRef = FirebaseDatabase.getInstance().getReference("postings");
+        postingListener = new PostingDataListener();
         fGeoFire = new GeoFire(ref);
     }
 
@@ -119,15 +128,16 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     }
 
     private void updateGeoQuery() {
-        if (fGoogleMap != null && fLocation != null) {
+        if (fGoogleMap != null && fLocation != null && fIsStarted) {
             if (fGeoQuery == null) {
                 GeoLocation geoLoc = new GeoLocation(fLocation.getLatitude(), fLocation.getLongitude());
                 // creates a new query around fLocation with a radius of 20 kilometers
+                // TODO: radius
                 fGeoQuery = fGeoFire.queryAtLocation(geoLoc, 20);
                 fGeoQueryEventListener = new GeoQueryEventListener() {
                     @Override
                     public void onKeyEntered(String key, GeoLocation location) {
-                        addMarker(location.latitude, location.longitude, "Test", "Descr", key);
+                        addMarker(location.latitude, location.longitude, key);
                     }
 
                     @Override
@@ -149,6 +159,15 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
                     }
                 };
                 fGeoQuery.addGeoQueryEventListener(fGeoQueryEventListener);
+            }
+        }
+        if (!this.fIsStarted && fGeoQuery != null) {
+            // the fragment stopped, remove listeners
+            fGeoQuery.removeGeoQueryEventListener(fGeoQueryEventListener);
+            fGeoQuery = null;
+            // remove all markers and data lsiteners
+            for (String id : fIdToMarkerWrapper.keySet()) {
+                removeMarker(id);
             }
         }
     }
@@ -209,15 +228,20 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     @Override
     public void onStart() {
         super.onStart();
+        fIsStarted = true;
         fGoogleApiClient.connect();
+        updateGeoQuery();
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        fIsStarted = false;
         if (fGoogleApiClient.isConnected()) {
             fGoogleApiClient.disconnect();
         }
+        updateGeoQuery();
     }
 
     @Override
@@ -236,9 +260,9 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     }
 
     private boolean onClick(Marker marker) {
-        String id = fMarkerToId.get(marker);
-        if (id != null) {
-            PostingDetailActivity.start(getActivity(), id);
+        MarkerWrapper wrapper = fMarkerToMakerWrapper.get(marker);
+        if (wrapper != null) {
+            PostingDetailActivity.start(getActivity(), wrapper.postingID);
         }
         return true;
     }
@@ -297,33 +321,77 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     }
 
 
-    private void addMarker(double latitude, double longitude, String name, String shortDescr, String id) {
+    private void addMarker(double latitude, double longitude, String id) {
         LatLng loc = new LatLng(latitude, longitude);
         MarkerOptions options = new MarkerOptions();
-        options.position(loc).draggable(true).title(name).snippet(shortDescr);
+        options.position(loc).draggable(true);
         //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_48dp));
         Marker marker = fGoogleMap.addMarker(options);
-        fIdToMarker.put(id, marker);
-        fMarkerToId.put(marker, id);
+        MarkerWrapper wrapper = new MarkerWrapper(marker, id);
+        fIdToMarkerWrapper.put(id, wrapper);
+        fMarkerToMakerWrapper.put(marker, wrapper);
+        // add the data to the marker
+        DatabaseReference postingRef = postingListRef.child(id);
+        postingRef.addValueEventListener(this.postingListener);
+        wrapper.postingRef = postingRef;
     }
 
     private void removeMarker(String key) {
-        Marker marker = fIdToMarker.get(key);
-        if (marker != null) {
-            fIdToMarker.remove(key);
-            fMarkerToId.remove(marker);
-            marker.remove();
+        MarkerWrapper markerWrapper = fIdToMarkerWrapper.get(key);
+        if (markerWrapper != null) {
+            fIdToMarkerWrapper.remove(key);
+            fMarkerToMakerWrapper.remove(markerWrapper.marker);
+            markerWrapper.marker.remove();
+            markerWrapper.postingRef.removeEventListener(this.postingListener);
         }
     }
 
     private void moveMarker(String key, double latitude, double longitude) {
-        Marker marker = fIdToMarker.get(key);
-        if (marker != null) {
+        MarkerWrapper markerWrapper = fIdToMarkerWrapper.get(key);
+        if (markerWrapper != null) {
             LatLng newLatLng = new LatLng(latitude, longitude);
-            marker.setPosition(newLatLng);
+            markerWrapper.marker.setPosition(newLatLng);
         }
     }
 
+
+    private class PostingDataListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            String key = dataSnapshot.getKey();
+            MarkerWrapper markerWrapper = PoiMapFragment.this.fIdToMarkerWrapper.get(key);
+            if (markerWrapper == null) {
+                return;
+            }
+            try {
+                PostingBean bean = dataSnapshot.getValue(PostingBean.class);
+                PostingWrapper postingWrapper = new PostingWrapper(bean);
+                markerWrapper.marker.setTitle(postingWrapper.getTitle());
+                markerWrapper.marker.setSnippet(postingWrapper.getSnippet());
+            }
+            catch (Exception x) {
+                x.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    }
+
+
+    private static class MarkerWrapper {
+        private Marker marker;
+        private String postingID;
+        public DatabaseReference postingRef;
+
+        public MarkerWrapper(Marker marker, String postingID) {
+            this.marker = marker;
+            this.postingID = postingID;
+        }
+
+    }
 
      public class PoiInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         private ThumbnailCache fCache;
@@ -344,14 +412,11 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
 
         @Override
         public View getInfoContents(Marker marker) {
-            String id = fMarkerToId.get(marker);
-            if (id == null) {
+            MarkerWrapper markerWrapper = fMarkerToMakerWrapper.get(marker);
+            if (markerWrapper == null) {
                 return null;
             }
-            Bitmap bitmap = fCache.getBitmap(id);
-            if (bitmap == null) {
-                return null;
-            }
+            Bitmap bitmap = fCache.getBitmap(markerWrapper.postingID);
             if (fView == null) {
                 fView = getLayoutInflater(null).inflate(R.layout.map_info_window, null);
                 fImage = (ImageView)fView.findViewById(R.id.imv_thumbnail);
