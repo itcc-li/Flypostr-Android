@@ -24,82 +24,82 @@ public class PostingWrapper {
     }
 
     public String getAuthorId() {
-        return bean.getAuthorId();
+        return bean.authorId;
     }
 
     public void setAuthorId(String authorId) {
-        bean.setAuthorId(authorId);
+        bean.authorId = authorId;
     }
 
     public String getTitle() {
-        return bean.getTitle();
+        return bean.title;
     }
 
     public void setTitle(String title) {
-        bean.setTitle(title);
+        bean.title = title;
     }
 
     public String getText() {
-        return bean.getText();
+        return bean.text;
     }
 
     public void setText(String text) {
-        bean.setText(text);
+        bean.text = text;
     }
 
     public String getImageId() {
-        return bean.getImageId();
+        return bean.imageId;
     }
 
     public void setImageId(String imageId) {
-        bean.setImageId(imageId);
+        bean.imageId = imageId;
     }
 
     public Date getCreatedAt() {
-        return ParseHelper.convertToDate(bean.getCreatedAt());
+        return ParseHelper.convertToDate(bean.createdAt);
     }
 
     public void setCreatedAt(Date createdAt) {
-        bean.setCreatedAt(ParseHelper.convertToString(createdAt));
+        bean.createdAt = ParseHelper.convertToString(createdAt);
     }
 
     public Date getModifiedAt() {
-        return ParseHelper.convertToDate(bean.getModifiedAt());
+        return ParseHelper.convertToDate(bean.modifiedAt);
     }
 
     public void setModifiedAt(Date modifiedAt) {
-        bean.setModifiedAt(ParseHelper.convertToString(modifiedAt));
+        bean.modifiedAt = ParseHelper.convertToString(modifiedAt);
     }
 
     public int getViewCount() {
-        return ParseHelper.convertToInteger(bean.getViewCount());
+        return ParseHelper.convertToInteger(bean.viewCount);
     }
 
-    public void setViewCount(int viewCount) {
-        bean.setViewCount(ParseHelper.convertToString(viewCount));
+    public void setViewCount(Integer viewCount) {
+        //bean.viewCount = ParseHelper.convertToLong(viewCount);
     }
 
     public int getCommentCount() {
-        return ParseHelper.convertToInteger(bean.getCommentCount());
+        return ParseHelper.convertToInteger(bean.commentCount);
     }
 
-    public void setCommentCount(int commentCount) {
-        bean.setCommentCount(ParseHelper.convertToString(commentCount));
+    public void setCommentCount(Integer commentCount) {
+        //bean.commentCount = ParseHelper.convertToLong(commentCount);
     }
 
     public Double getLat() {
-        return bean.getLat();
+        return bean.lat;
     }
 
     public void setLat(Double lat) {
-        bean.setLat(lat);
+        bean.lat = lat;
     }
 
     public Double getLng() {
-        return bean.getLng();
+        return bean.lng;
     }
 
     public void setLng(Double lng) {
-        bean.setLng(lng);
+        bean.lng = lng;
     }
 }

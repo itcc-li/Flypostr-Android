@@ -45,7 +45,7 @@ import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
 import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
-import li.itcc.flypostr.posting.PostingDetailActivity;
+import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 /**
@@ -331,7 +331,6 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
         private ImageView fImage;
         private TextView fName;
         private TextView fDescription;
-
 
         public PoiInfoWindowAdapter() {
             fCache = new ThumbnailCache(getContext());

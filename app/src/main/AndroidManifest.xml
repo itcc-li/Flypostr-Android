@@ -35,17 +35,13 @@
         <activity android:name=".auth.EmailPasswordActivity" android:label="@string/app_name" />
         <activity android:name=".auth.ProgressDialogActivity" android:label="@string/app_name" />
         <activity android:name=".MainActivity" android:label="@string/app_name" />
-        <activity android:name=".poiadd.PoiAddActivity" />
-        <activity android:name=".poidetail.PoiDetailActivity"/>
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
-        </activity>
-        <activity android:name=".postingAdd.PostingAddActivity">
-
-        </activity>
-        <activity android:name=".posting.PostingDetailActivity"/>
+        <activity android:name=".postingAdd.PostingAddActivity" />
+        <activity android:name=".postingDetail.PostingDetailActivity"/>
         <activity android:name=".exactlocation.ExactLocationActivity"/>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -55,7 +51,6 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
