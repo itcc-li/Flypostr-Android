@@ -1,4 +1,4 @@
-package li.itcc.flypostr.poiadd;
+package li.itcc.flypostr.postingAdd;
 
 import java.io.File;
 import java.io.FileOutputStream;

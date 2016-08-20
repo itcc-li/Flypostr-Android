@@ -1,4 +1,4 @@
-package li.itcc.flypostr.poiadd;
+package li.itcc.flypostr.postingAdd;
 
 import android.Manifest;
 import android.app.Activity;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -31,23 +32,30 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.UUID;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.exactlocation.ExactLocationActivity;
-
-import static li.itcc.flypostr.poimap.PoiMapFragment.PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION;
+import li.itcc.flypostr.model.PostingWrapper;
+import li.itcc.flypostr.util.StreamUtil;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
-    private DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
+public class PostingAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
+    private static final int OPEN_GALERY = 1;
+    private static final int OPEN_CAMERA = 2;
+    private static DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
+    private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
+    private static final int PERMISSIONS_REQUEST_EXTERNAL_STORAGE_CAMERA = 102;
+    private static final int PERMISSIONS_REQUEST_EXTERNAL_STORAGE_GALERY = 103;
     private static final String KEY_LOCATION = "KEY_LOCATION";
     private static final String KEY_EXACT_LOCATION = "KEY_EXACT_LOCATION";
     private static final int REQUEST_TAKE_PICTURE = 1;
@@ -57,8 +65,8 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
     public static final int FINAL_PICTURE_SIZE = 1080;
     private View fCancelButton;
     private View fSaveButton;
-    private EditText fName;
-    private EditText fDescription;
+    private EditText poiTitle;
+    private EditText poiText;
     private View fTakePictureButton;
     private ImageView fImage;
     private View fOpenGaleryButton;
@@ -74,13 +82,14 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
     private View fExactLocationButton;
 
     public static void start(Activity parent) {
-        Intent i = new Intent(parent, PoiAddActivity.class);
+        Intent i = new Intent(parent, PostingAddActivity.class);
         parent.startActivityForResult(i, 0);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // we use external storage here so that the cropping activity can access the image file
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         fLocalImageFileOriginal = new File(storageDir, "TEMP_Flypostr_Original.jpg");
         fLocalImageFileCropped = new File(storageDir, "TEMP_Flypostr_Cropped.jpg");
@@ -132,8 +141,8 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             }
         });
         fLocationText = (TextView) findViewById(R.id.txv_location_text);
-        fName = (EditText) findViewById(R.id.etx_name);
-        fDescription = (EditText) findViewById(R.id.etx_description);
+        poiTitle = (EditText) findViewById(R.id.etx_name);
+        poiText = (EditText) findViewById(R.id.etx_description);
         fImage = (ImageView) findViewById(R.id.img_image);
         buildGoogleApiClient();
         // restore state
@@ -142,6 +151,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             fExactLocation = savedInstanceState.getParcelable(KEY_EXACT_LOCATION);
         }
         updateLocationUI();
+
     }
 
     @Override
@@ -184,7 +194,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             return;
         }
         if (shouldBeRegistered) {
-            checkPermissionAndRegister(true);
+            checkLocationPermissionAndRegister(true);
         }
         else {
             LocationServices.FusedLocationApi.removeLocationUpdates(fGoogleApiClient, this);
@@ -192,7 +202,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    private void checkPermissionAndRegister(boolean executeRequest) {
+    private void checkLocationPermissionAndRegister(boolean executeRequest) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (executeRequest) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
@@ -211,7 +221,15 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        checkPermissionAndRegister(false);
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION) {
+            checkLocationPermissionAndRegister(false);
+        }
+        else if (requestCode == PERMISSIONS_REQUEST_EXTERNAL_STORAGE_CAMERA) {
+            checkExternalStoragePermission(OPEN_CAMERA, false);
+        }
+        else if (requestCode == PERMISSIONS_REQUEST_EXTERNAL_STORAGE_GALERY) {
+            checkExternalStoragePermission(OPEN_GALERY, false);
+        }
     }
 
     private synchronized void buildGoogleApiClient() {
@@ -307,37 +325,66 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void onOpenGaleryClick(View v) {
-        getPictureFromGallery();
+        checkExternalStoragePermission(OPEN_GALERY, true);
     }
 
     private void onTakePictureClick(View v) {
+        checkExternalStoragePermission(OPEN_CAMERA, true);
         takePicture();
+    }
+
+    private void checkExternalStoragePermission(int medium, boolean executeRequest) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (executeRequest) {
+                int requestId;
+                if (medium == OPEN_GALERY) {
+                    requestId = PERMISSIONS_REQUEST_EXTERNAL_STORAGE_GALERY;
+                }
+                else if (medium == OPEN_CAMERA) {
+                    requestId = PERMISSIONS_REQUEST_EXTERNAL_STORAGE_CAMERA;
+                }
+                else {
+                    throw new RuntimeException();
+                }
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestId);
+            }
+        }
+        else {
+            if (medium == OPEN_GALERY) {
+                getPictureFromGallery();
+            }
+            else if (medium == OPEN_CAMERA) {
+                takePicture();
+            }
+            else {
+                throw new RuntimeException();
+            }
+        }
+
     }
 
     private void onSaveClick(View v) {
         // validate input
-        String poiName = fName.getText().toString();
-        String poiDescription = fDescription.getText().toString();
+        String title = poiTitle.getText().toString();
+        String text = poiText.getText().toString();
         if (fLocation == null) {
             Toast.makeText(this, R.string.txt_location_missing, Toast.LENGTH_LONG).show();
             return;
         }
         // validation is o.k., create new bean
-        PoiCreateBean detail = new PoiCreateBean();
-        detail.setUuid(UUID.randomUUID().toString());
-        detail.setPoiName(poiName);
-        detail.setPoiDescription(poiDescription);
-        detail.setLatitude(fLocation.getLatitude());
-        detail.setLongitude(fLocation.getLongitude());
+        PostingWrapper detail = new PostingWrapper();
+        detail.setTitle(title);
+        detail.setText(text);
+        detail.setLat(fLocation.getLatitude());
+        detail.setLng(fLocation.getLongitude());
         if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS + 0.5) {
-            detail.setExactLatitude(fExactLocation.getLatitude());
-            detail.setExactLongitude(fExactLocation.getLongitude());
+            // TODO: support for exact location
+            // detail.setExactLatitude(fExactLocation.getLatitude());
+            // detail.setExactLongitude(fExactLocation.getLongitude());
         }
-
-        // TODO:  save detail
-        //  LocalPoiSaver saver = new LocalPoiSaver(getApplicationContext());
-        // fire and forget
-        //saver.save(detail, fLocalImageFileCropped);
+        PostingDetailSaver saver = new PostingDetailSaver(getApplicationContext());
+        // TODO: use a listener and finish upon success
+        saver.save(detail, fLocalImageFileCropped);
         finish();
     }
 
@@ -372,7 +419,7 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             try {
                 if (requestCode == REQUEST_GET_GALLERY_PICTURE) {
                     Uri selectedImageUri = data.getData();
-                    //copyToLocalFile(selectedImageUri);
+                    copyToLocalFile(selectedImageUri);
                     cropPicture();
                 }
                 else if (requestCode == REQUEST_TAKE_PICTURE) {
@@ -393,6 +440,55 @@ public class PoiAddActivity extends AppCompatActivity implements GoogleApiClient
             }
         }
     }
+
+    public void copyToLocalFile(Uri uri) throws IOException {
+        boolean done = false;
+        if( uri != null ) {
+            // create local file
+            if (Uri.fromFile(fLocalImageFileOriginal).equals(uri)) {
+                return;
+            }
+            InputStream in = getContentResolver().openInputStream(uri);
+            long totalSize = 0;
+            if (in != null) {
+                totalSize = copyToOutput(in);
+            }
+            if (totalSize == 0L) {
+                // this might happen on older devices
+                // try to retrieve the image from the media store first
+                // this will only work for images selected from gallery
+                String[] projection = {MediaStore.Images.Media.DATA};
+                Cursor cursor = managedQuery(uri, projection, null, null, null);
+                if (cursor != null) {
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    cursor.moveToFirst();
+                    String path = cursor.getString(column_index);
+                    if (path != null) {
+                        InputStream altIn = new FileInputStream(path);
+                        long length = copyToOutput(altIn);
+                        if (length > 0L) {
+                            done = true;
+                        }
+                    }
+                }
+            }
+            else {
+                done = true;
+            }
+        }
+        if (!done) {
+            fLocalImageFileOriginal.delete();
+        }
+    }
+
+    private long copyToOutput(InputStream in) throws IOException {
+        File outFile = fLocalImageFileOriginal;
+        FileOutputStream out = new FileOutputStream(outFile);
+        long totalSize = StreamUtil.pumpAllAndClose(in, out);
+        return totalSize;
+    }
+
+
 
     private void updateImagePreview() {
         int addPictureButtonVisibility;

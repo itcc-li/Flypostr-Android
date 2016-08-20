@@ -27,8 +27,8 @@ import java.text.DecimalFormat;
 
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
-import li.itcc.flypostr.poiadd.PoiAddOnClickListener;
-import li.itcc.flypostr.poidetail.PoiDetailActivity;
+import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
+import li.itcc.flypostr.posting.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 
@@ -64,7 +64,7 @@ public class PoiListFragment extends Fragment implements GoogleApiClient.Connect
         fListView = (ListView) rootView.findViewById(android.R.id.list);
         fEmptyText = (TextView) rootView.findViewById(android.R.id.empty);
         fCreateButton = rootView.findViewById(R.id.viw_add_button);
-        fCreateButton.setOnClickListener(new PoiAddOnClickListener(getActivity()));
+        fCreateButton.setOnClickListener(new PostingAddOnClickListener(getActivity()));
         fProgressBar = (ProgressBar) rootView.findViewById(R.id.prb_progress);
         fProgressBar.setMax(100);
         fProgressBar.setVisibility(View.GONE);
@@ -115,7 +115,7 @@ public class PoiListFragment extends Fragment implements GoogleApiClient.Connect
     private void onListItemClick(int position, long id) {
         Cursor c = (Cursor) fDataAdapter.getItem(position);
         String poiId = ""; // TODO
-        PoiDetailActivity.start(getActivity(), poiId);
+        PostingDetailActivity.start(getActivity(), poiId);
     }
 
     private synchronized void buildGoogleApiClient() {

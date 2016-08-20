@@ -41,10 +41,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
+import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
-import li.itcc.flypostr.poiadd.PoiAddOnClickListener;
-import li.itcc.flypostr.poidetail.PoiDetailActivity;
+import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
+import li.itcc.flypostr.posting.PostingDetailActivity;
 import li.itcc.flypostr.util.ThumbnailCache;
 
 /**
@@ -53,7 +54,7 @@ import li.itcc.flypostr.util.ThumbnailCache;
  */
 public class PoiMapFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
-    public static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
+    private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private GoogleMap fGoogleMap;
     private HashMap<String, Marker> fIdToMarker = new HashMap<>();
     private HashMap<Marker, String> fMarkerToId = new HashMap<>();
@@ -69,7 +70,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geoLocation");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
         fGeoFire = new GeoFire(ref);
     }
 
@@ -88,7 +89,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
             View rootView = inflater.inflate(R.layout.poi_map_fragment, container, false);
             FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.frame_layout);
             fCreateButton = rootView.findViewById(R.id.viw_add_button);
-            fCreateButton.setOnClickListener(new PoiAddOnClickListener(getActivity()));
+            fCreateButton.setOnClickListener(new PostingAddOnClickListener(getActivity()));
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             container.removeView(v);
             frame.addView(v, params);
@@ -121,7 +122,6 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
         if (fGoogleMap != null && fLocation != null) {
             if (fGeoQuery == null) {
                 GeoLocation geoLoc = new GeoLocation(fLocation.getLatitude(), fLocation.getLongitude());
-                // fGeoFire.setLocation("id654387", geoLoc);
                 // creates a new query around fLocation with a radius of 20 kilometers
                 fGeoQuery = fGeoFire.queryAtLocation(geoLoc, 20);
                 fGeoQueryEventListener = new GeoQueryEventListener() {
@@ -238,7 +238,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
     private boolean onClick(Marker marker) {
         String id = fMarkerToId.get(marker);
         if (id != null) {
-            PoiDetailActivity.start(getActivity(), id);
+            PostingDetailActivity.start(getActivity(), id);
         }
         return true;
     }
