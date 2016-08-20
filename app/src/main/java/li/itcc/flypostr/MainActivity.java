@@ -93,8 +93,11 @@ public class MainActivity extends AppCompatActivity
         else if (position == 1) {
             newFragment = new PoiMapFragment();
         }
-        else {
+        else if (position == 2){
             newFragment = new AboutFragment();
+        }
+        else {
+            newFragment = new Signout();
         }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, newFragment)
