@@ -15,11 +15,12 @@ import android.widget.Toast;
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.model.PostingWrapper;
+import li.itcc.flypostr.util.ImageLoader;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, PostingImageLoader.PostingImageLoaderCallback {
+public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, ImageLoader.ImageLoaderCallback {
     private static final String KEY_ID = "KEY_ID";
     private String id;
     private TextView title;
@@ -29,7 +30,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     private TextView progressText;
 
     private PostingDetailLoader loadTask;
-    private PostingImageLoader loadImageTask;
+    private ImageLoader loadImageTask;
 
     public static void start(Activity parent, String poiId) {
         Intent i = new Intent(parent, PostingDetailActivity.class);
@@ -50,7 +51,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
             return;
         }
 
-        loadImageTask = new PostingImageLoader(this, PoiConstants.ROOT_IMAGES_STORAGE);
+        loadImageTask = new ImageLoader(this, PoiConstants.ROOT_IMAGES_STORAGE);
         loadTask = new PostingDetailLoader(this);
 
         title = (TextView)findViewById(R.id.txv_title);
@@ -88,7 +89,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     }
 
     private void loadImage(String filename) {
-        loadImageTask.loadImage(filename, this);
+        loadImageTask.startProgress(filename, this);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     }
 
     @Override
-    public void onImageReceived(Bitmap bitmap) {
+    public void onImageLoaded(String filename, Bitmap bitmap) {
         image.setImageBitmap(bitmap);
 
         // disable ui elements
@@ -116,7 +117,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     }
 
     @Override
-    public void onUpdateProgressDownload(long bytesReceived, long totalByteCount) {
+    public void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount) {
         Log.i("FlyPostr", "Bytes received: " + bytesReceived + ", Bytes to Transfare: " + totalByteCount);
 
         if (totalByteCount <= 0) {
