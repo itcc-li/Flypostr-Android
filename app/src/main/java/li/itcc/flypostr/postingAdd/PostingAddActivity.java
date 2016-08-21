@@ -44,7 +44,7 @@ import java.util.List;
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.UserData;
-import li.itcc.flypostr.exactLocation.ExactLocationActivity;
+import li.itcc.flypostr.exactLoc.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
 

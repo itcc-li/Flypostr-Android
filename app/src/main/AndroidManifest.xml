@@ -38,7 +38,7 @@
         <!-- App screens -->
         <activity android:name=".postingAdd.PostingAddActivity" />
         <activity android:name=".postingDetail.PostingDetailActivity"/>
-        <activity android:name=".exactLocation.ExactLocationActivity"/>
+        <activity android:name=".exactLoc.ExactLocationActivity"/>
         <activity android:name=".commentAdd.CommentAddActivity" />
 
         <meta-data

@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import li.itcc.flypostr.poilist.PoiListFragment;
+import li.itcc.flypostr.postingList.PostingListFragment;
 import li.itcc.flypostr.postingMap.PostingMapFragment;
 
 /**
@@ -31,7 +31,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
             return new PostingMapFragment();
         }
         else if (position == 1) {
-            return new PoiListFragment();
+            return new PostingListFragment();
         }
         throw new RuntimeException();
     }

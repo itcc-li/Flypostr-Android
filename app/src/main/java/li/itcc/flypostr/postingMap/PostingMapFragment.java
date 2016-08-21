@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -411,6 +412,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
 
         @Override
         public void onError(Throwable e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         @Override

@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import li.itcc.flypostr.R;
-import li.itcc.flypostr.guiutil.SquareImageView;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.postingDetail.PostingDetailLoader;
 import li.itcc.flypostr.util.ImageLoader;
+import li.itcc.flypostr.util.SquareImageView;
 
 /**
  * Created by sandro.pedrett on 21.08.2016.

@@ -2,6 +2,7 @@ package li.itcc.flypostr.postingList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,8 @@ import com.google.android.gms.tasks.RuntimeExecutionException;
 
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
-import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
+import li.itcc.flypostr.auth.AuthUtil;
+import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 
 
@@ -41,7 +43,8 @@ public class PostingListFragment extends Fragment implements GoogleApiClient.Con
         listView = (RecyclerView) rootView.findViewById(android.R.id.list);
         emptyText = (TextView) rootView.findViewById(android.R.id.empty);
         createButton = rootView.findViewById(R.id.viw_add_button);
-        createButton.setOnClickListener(new PostingAddOnClickListener(getActivity()));
+        Intent createParams = new Intent();
+        createButton.setOnClickListener(new AuthenticateClickListener(activity, AuthUtil.REQUEST_CODE_ADD_POSTING, createParams));
 
         // list adapter
         dataAdapter = new PostingListAdapter(activity, this);

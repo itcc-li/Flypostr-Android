@@ -1,4 +1,4 @@
-package li.itcc.flypostr.exactLocation;
+package li.itcc.flypostr.exactLoc;
 
 import android.app.Activity;
 import android.content.Context;
