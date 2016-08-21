@@ -31,7 +31,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import li.itcc.flypostr.MainActivity;
 import li.itcc.flypostr.R;
 
 public class EmailPasswordActivity extends ProgressDialogActivity implements
@@ -41,37 +40,19 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
     private static final boolean START_MAIN_ACTIVITY = true;
 
     private TextView mStatusTextView;
-    private TextView mDetailTextView;
     private EditText mEmailField;
     private EditText mPasswordField;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
-
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
 
-    private void startMainAndFinish() {
-        startActivity(MainActivity.createIntent(this));
-        finish();
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            if (START_MAIN_ACTIVITY) {
-                startMainAndFinish();
-                return;
-            }
-        }
         setContentView(R.layout.activity_emailpassword);
 
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
         mEmailField = (EditText) findViewById(R.id.field_email);
         mPasswordField = (EditText) findViewById(R.id.field_password);
 
@@ -92,9 +73,8 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    if (START_MAIN_ACTIVITY) {
-                        startMainAndFinish();
-                    }
+                    AuthUtil.finishWithUser(EmailPasswordActivity.this, user);
+                    return;
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -222,14 +202,12 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.emailpassword_status_fmt, user.getEmail()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.email_password_buttons).setVisibility(View.GONE);
             findViewById(R.id.email_password_fields).setVisibility(View.GONE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
             findViewById(R.id.email_password_fields).setVisibility(View.VISIBLE);

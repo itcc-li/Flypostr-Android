@@ -130,6 +130,7 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
         private Context mContext;
         private Class[] mClasses;
         private int[] mDescriptionIds;
+        private String[] mClassesname = {"Google Login", "Facebook login", "Twitter login", "Email login"};
 
         public MyArrayAdapter(Context context, int resource, Class[] objects) {
             super(context, resource, objects);
@@ -147,7 +148,7 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
                 view = inflater.inflate(android.R.layout.simple_list_item_2, null);
             }
 
-            ((TextView) view.findViewById(android.R.id.text1)).setText(mClasses[position].getSimpleName());
+            ((TextView) view.findViewById(android.R.id.text1)).setText(mClassesname[position]);
             ((TextView) view.findViewById(android.R.id.text2)).setText(mDescriptionIds[position]);
 
             return view;

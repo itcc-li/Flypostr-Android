@@ -39,7 +39,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import li.itcc.flypostr.MainActivity;
 import li.itcc.flypostr.R;
 
 /**
@@ -52,40 +51,20 @@ public class FacebookLoginActivity extends ProgressDialogActivity implements
     private static final boolean START_MAIN_ACTIVITY = true;
 
     private TextView mStatusTextView;
-    private TextView mDetailTextView;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
-
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
 
     private CallbackManager mCallbackManager;
-////
-    private void startMainAndFinish() {
-        startActivity(MainActivity.createIntent(this));
-        finish();
-    }
-////
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_facebook);
-////
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            if (START_MAIN_ACTIVITY) {
-                startMainAndFinish();
-                return;
-            }
-        }
-////
+
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
         findViewById(R.id.button_facebook_signout).setOnClickListener(this);
 
         // [START initialize_auth]
@@ -101,9 +80,8 @@ public class FacebookLoginActivity extends ProgressDialogActivity implements
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    if (START_MAIN_ACTIVITY) {
-                        startMainAndFinish();
-                    }
+                    AuthUtil.finishWithUser(FacebookLoginActivity.this, user);
+                    return;
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -212,13 +190,11 @@ public class FacebookLoginActivity extends ProgressDialogActivity implements
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.facebook_status_fmt, user.getDisplayName()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.button_facebook_login).setVisibility(View.GONE);
             findViewById(R.id.button_facebook_signout).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.button_facebook_login).setVisibility(View.VISIBLE);
             findViewById(R.id.button_facebook_signout).setVisibility(View.GONE);

@@ -23,10 +23,8 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import li.itcc.flypostr.MainActivity;
-import li.itcc.flypostr.R;
-
 import io.fabric.sdk.android.Fabric;
+import li.itcc.flypostr.R;
 
 public class TwitterLoginActivity extends ProgressDialogActivity
         implements View.OnClickListener {
@@ -35,22 +33,11 @@ public class TwitterLoginActivity extends ProgressDialogActivity
     private static final boolean START_MAIN_ACTIVITY = true;
 
     private TextView mStatusTextView;
-    private TextView mDetailTextView;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
-
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
 
     private TwitterLoginButton mLoginButton;
-
-    private void startMainAndFinish() {
-        startActivity(MainActivity.createIntent(this));
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +49,11 @@ public class TwitterLoginActivity extends ProgressDialogActivity
                 getString(R.string.twitter_consumer_secret));
         Fabric.with(this, new Twitter(authConfig));
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            if (START_MAIN_ACTIVITY) {
-                startMainAndFinish();
-                return;
-            }
-        }
         // Inflate layout (must be done after Twitter is configured)
         setContentView(R.layout.activity_twitter);
 
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
         findViewById(R.id.button_twitter_signout).setOnClickListener(this);
 
         // [START initialize_auth]
@@ -90,9 +69,8 @@ public class TwitterLoginActivity extends ProgressDialogActivity
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    if (START_MAIN_ACTIVITY) {
-                        startMainAndFinish();
-                    }
+                    AuthUtil.finishWithUser(TwitterLoginActivity.this, user);
+                    return;
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -193,13 +171,11 @@ public class TwitterLoginActivity extends ProgressDialogActivity
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.twitter_status_fmt, user.getDisplayName()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.button_twitter_login).setVisibility(View.GONE);
             findViewById(R.id.button_twitter_signout).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.button_twitter_login).setVisibility(View.VISIBLE);
             findViewById(R.id.button_twitter_signout).setVisibility(View.GONE);
