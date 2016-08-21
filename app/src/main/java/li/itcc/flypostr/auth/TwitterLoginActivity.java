@@ -74,7 +74,6 @@ public class TwitterLoginActivity extends ProgressDialogActivity
 
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
         findViewById(R.id.button_twitter_signout).setOnClickListener(this);
 
         // [START initialize_auth]
@@ -193,13 +192,11 @@ public class TwitterLoginActivity extends ProgressDialogActivity
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.twitter_status_fmt, user.getDisplayName()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.button_twitter_login).setVisibility(View.GONE);
             findViewById(R.id.button_twitter_signout).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.button_twitter_login).setVisibility(View.VISIBLE);
             findViewById(R.id.button_twitter_signout).setVisibility(View.GONE);

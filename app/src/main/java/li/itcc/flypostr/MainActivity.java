@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import li.itcc.flypostr.Profile.Profile;
 import li.itcc.flypostr.poilist.PoiListFragment;
 import li.itcc.flypostr.poimap.PoiMapFragment;
 
@@ -95,6 +96,9 @@ public class MainActivity extends AppCompatActivity
         }
         else if (position == 2){
             newFragment = new AboutFragment();
+        }
+        else if (position == 3){
+            newFragment = new Profile();
         }
         else {
             newFragment = new Signout();

@@ -41,7 +41,6 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
     private static final boolean START_MAIN_ACTIVITY = true;
 
     private TextView mStatusTextView;
-    private TextView mDetailTextView;
     private EditText mEmailField;
     private EditText mPasswordField;
 
@@ -71,7 +70,6 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
 
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
         mEmailField = (EditText) findViewById(R.id.field_email);
         mPasswordField = (EditText) findViewById(R.id.field_password);
 
@@ -222,14 +220,12 @@ public class EmailPasswordActivity extends ProgressDialogActivity implements
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.emailpassword_status_fmt, user.getEmail()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.email_password_buttons).setVisibility(View.GONE);
             findViewById(R.id.email_password_fields).setVisibility(View.GONE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
             findViewById(R.id.email_password_fields).setVisibility(View.VISIBLE);

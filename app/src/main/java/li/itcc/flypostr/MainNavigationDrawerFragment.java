@@ -104,6 +104,7 @@ public class MainNavigationDrawerFragment extends Fragment {
                         getString(R.string.title_poi_list),
                         getString(R.string.title_overview_map),
                         getString(R.string.title_section3),
+                        getString(R.string.profile),
                         getString(R.string.sign_out),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);

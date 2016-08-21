@@ -19,7 +19,7 @@
             android:id="@+id/icon"
             style="@style/ThemeOverlay.FirebaseIcon"
             android:contentDescription="@string/desc_firebase_lockup"
-            android:src="@drawable/firebase_lockup_400"
+            android:src="@drawable/flypostr_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -35,11 +35,6 @@
             android:id="@+id/status"
             style="@style/ThemeOverlay.MyTextDetail"
             android:text="@string/signed_out" />
-
-        <TextView
-            android:id="@+id/detail"
-            style="@style/ThemeOverlay.MyTextDetail"
-            tools:text="Firebase User ID: 123456789abc" />
 
     </LinearLayout>
 
