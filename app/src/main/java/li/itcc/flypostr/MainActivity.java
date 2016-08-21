@@ -50,15 +50,21 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.sign_out_button){
+        }
+        else if(id == R.id.sign_out_button){
             FirebaseAuth.getInstance().signOut();
             return true;
-        }else if(id == R.id.action_about){
-            startActivity(About.createIntent(this));
-            finish();
+        }
+        else if(id == R.id.action_about){
+            startAboutActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startAboutActivity() {
+        startActivity(About.createIntent(this));
+
     }
 
     @Override

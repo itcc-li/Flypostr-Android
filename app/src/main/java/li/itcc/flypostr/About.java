@@ -12,7 +12,7 @@ public class About extends MainActivity {
 
     public static Intent createIntent(Context context) {
         Intent i = new Intent(context, About.class);
-    return i;
+        return i;
     }
 
     @Override
