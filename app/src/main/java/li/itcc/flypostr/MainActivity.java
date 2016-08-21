@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import li.itcc.flypostr.poilist.PoiListFragment;
+import li.itcc.flypostr.postingList.PostingListFragment;
 import li.itcc.flypostr.poimap.PoiMapFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        //mGoogleApiClient.disconnect();
+        //mGoogleApiClient.detach();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment newFragment;
         if (position == 0) {
-            newFragment = new PoiListFragment();
+            newFragment = new PostingListFragment();
         }
         else if (position == 1) {
             newFragment = new PoiMapFragment();
