@@ -41,7 +41,7 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
 
     public void save(PostingWrapper detail, File localImageFile) {
         String imageID;
-        if (localImageFile != null) {
+        if (localImageFile != null && localImageFile.exists()) {
             imageID = UUID.randomUUID().toString() + ".jpg";
         }
         else {
@@ -62,7 +62,7 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
         }
         // upload image
         // TODO: set imageId after image and thumbnail are uploaded
-        if (localImageFile != null) {
+        if (imageID != null) {
             ImageCache cacheThumb = new ImageCache(context, PoiConstants.ROOT_THUMBNAIL_STORAGE, -1);
             ImageCache cacheImage = new ImageCache(context, PoiConstants.ROOT_IMAGES_STORAGE, -1);
 
