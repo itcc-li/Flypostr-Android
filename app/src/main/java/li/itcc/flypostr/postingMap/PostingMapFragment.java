@@ -1,4 +1,4 @@
-package li.itcc.flypostr.poimap;
+package li.itcc.flypostr.postingMap;
 
 
 import android.Manifest;
@@ -46,9 +46,10 @@ import java.util.HashMap;
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
+import li.itcc.flypostr.auth.AuthUtil;
+import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
-import li.itcc.flypostr.postingAdd.PostingAddOnClickListener;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 import li.itcc.flypostr.util.ImageLoader;
 
@@ -56,7 +57,7 @@ import li.itcc.flypostr.util.ImageLoader;
  * Created by Arthur on 12.09.2015.
  *
  */
-public class PoiMapFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
+public class PostingMapFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
     private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private GoogleMap fGoogleMap;
@@ -100,7 +101,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
             View rootView = inflater.inflate(R.layout.poi_map_fragment, container, false);
             FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.frame_layout);
             fCreateButton = rootView.findViewById(R.id.viw_add_button);
-            fCreateButton.setOnClickListener(new PostingAddOnClickListener(getActivity()));
+            fCreateButton.setOnClickListener(new AuthenticateClickListener(getActivity(), AuthUtil.REQUEST_CODE_ADD_POSTING));
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             container.removeView(v);
             frame.addView(v, params);
@@ -369,7 +370,7 @@ public class PoiMapFragment extends SupportMapFragment implements GoogleApiClien
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             String key = dataSnapshot.getKey();
-            MarkerWrapper markerWrapper = PoiMapFragment.this.fIdToMarkerWrapper.get(key);
+            MarkerWrapper markerWrapper = PostingMapFragment.this.fIdToMarkerWrapper.get(key);
             if (markerWrapper == null) {
                 return;
             }

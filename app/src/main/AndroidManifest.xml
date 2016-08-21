@@ -20,13 +20,15 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".auth.ChooserActivity" android:label="@string/app_title">
-            <intent-filter>
-              <action android:name="android.intent.action.MAIN"/>
 
-              <category android:name="android.intent.category.LAUNCHER"/>
+        <activity android:name=".MainActivity" android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Authentication screens -->
+        <activity android:name=".auth.ChooserActivity" android:label="@string/app_title"/>
         <activity android:name=".auth.GoogleSignInActivity" android:label="@string/app_name" />
         <activity android:name=".auth.AnonymousAuthActivity" android:label="@string/app_name" />
         <activity android:name=".auth.CustomAuthActivity" android:label="@string/app_name" />
@@ -34,10 +36,10 @@
         <activity android:name=".auth.TwitterLoginActivity" android:label="@string/app_name" />
         <activity android:name=".auth.EmailPasswordActivity" android:label="@string/app_name" />
         <activity android:name=".auth.ProgressDialogActivity" android:label="@string/app_name" />
-        <activity android:name=".MainActivity" android:label="@string/app_name" />
+        <!-- App screens -->
         <activity android:name=".postingAdd.PostingAddActivity" />
         <activity android:name=".postingDetail.PostingDetailActivity"/>
-        <activity android:name=".exactlocation.ExactLocationActivity"/>
+        <activity android:name=".exactLocation.ExactLocationActivity"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
