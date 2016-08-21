@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         getMenuInflater().inflate(R.menu.signout, menu);
+        getMenuInflater().inflate(R.menu.about, menu);
         return true;
     }
 
@@ -51,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }else if(id == R.id.sign_out_button){
             FirebaseAuth.getInstance().signOut();
+            return true;
+        }else if(id == R.id.action_about){
+            startActivity(About.createIntent(this));
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

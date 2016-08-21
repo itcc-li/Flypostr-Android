@@ -36,6 +36,7 @@
         <activity android:name=".auth.TwitterLoginActivity" android:label="@string/app_name" />
         <activity android:name=".auth.EmailPasswordActivity" android:label="@string/app_name" />
         <activity android:name=".auth.ProgressDialogActivity" android:label="@string/app_name" />
+        <activity android:name=".About" android:label="@string/app_title"/>
         <!-- App screens -->
         <activity android:name=".postingAdd.PostingAddActivity" />
         <activity android:name=".postingDetail.PostingDetailActivity"/>
