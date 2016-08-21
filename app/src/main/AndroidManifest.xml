@@ -30,8 +30,6 @@
         <!-- Authentication screens -->
         <activity android:name=".auth.ChooserActivity" android:label="@string/app_title"/>
         <activity android:name=".auth.GoogleSignInActivity" android:label="@string/app_name" />
-        <activity android:name=".auth.AnonymousAuthActivity" android:label="@string/app_name" />
-        <activity android:name=".auth.CustomAuthActivity" android:label="@string/app_name" />
         <activity android:name=".auth.FacebookLoginActivity" android:label="@string/app_name" />
         <activity android:name=".auth.TwitterLoginActivity" android:label="@string/app_name" />
         <activity android:name=".auth.EmailPasswordActivity" android:label="@string/app_name" />
@@ -40,6 +38,7 @@
         <activity android:name=".postingAdd.PostingAddActivity" />
         <activity android:name=".postingDetail.PostingDetailActivity"/>
         <activity android:name=".exactLocation.ExactLocationActivity"/>
+        <activity android:name=".commentAdd.CommentAddActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

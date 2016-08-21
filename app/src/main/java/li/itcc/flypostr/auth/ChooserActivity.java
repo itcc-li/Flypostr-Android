@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 
 /**
@@ -63,16 +64,16 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
     };
 
     private FirebaseAuth mAuth;
+    private Intent params;
 
     public static Intent createIntent(Context context) {
         Intent in = new Intent();
-        in.setClass(context, ChooserActivity.class);
         return in;
     }
 
-    public static void start(Activity parent, int requestCode) {
-        Intent i = createIntent(parent);
-        parent.startActivityForResult(i, requestCode);
+    public static void start(Activity parent, int requestCode, Intent params) {
+        params.setClass(parent, ChooserActivity.class);
+        parent.startActivityForResult(params, requestCode);
     }
 
 
@@ -86,14 +87,14 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
         super.onStop();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.params = getIntent();
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            AuthUtil.finishWithUser(this, currentUser);
+            AuthUtil.finishWithUser(this, currentUser, this.params);
             return;
         }
         setContentView(R.layout.activity_chooser);
@@ -120,6 +121,8 @@ public class ChooserActivity extends AppCompatActivity  implements AdapterView.O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == AuthUtil.AUTHENTICATION_OK) {
+            UserData userData = (UserData)data.getExtras().get(PoiConstants.INTENT_KEY_USER_DATA);
+            params.putExtra(PoiConstants.INTENT_KEY_USER_DATA, userData);
             setResult(resultCode, data);
             finish();
         }

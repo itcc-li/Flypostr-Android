@@ -2,6 +2,7 @@ package li.itcc.flypostr.poilist;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -65,7 +66,8 @@ public class PoiListFragment extends Fragment implements GoogleApiClient.Connect
         fListView = (ListView) rootView.findViewById(android.R.id.list);
         fEmptyText = (TextView) rootView.findViewById(android.R.id.empty);
         fCreateButton = rootView.findViewById(R.id.viw_add_button);
-        fCreateButton.setOnClickListener(new AuthenticateClickListener(activity, AuthUtil.REQUEST_CODE_ADD_POSTING));
+        Intent createParams = new Intent();
+        fCreateButton.setOnClickListener(new AuthenticateClickListener(activity, AuthUtil.REQUEST_CODE_ADD_POSTING, createParams));
         fProgressBar = (ProgressBar) rootView.findViewById(R.id.prb_progress);
         fProgressBar.setMax(100);
         fProgressBar.setVisibility(View.GONE);
