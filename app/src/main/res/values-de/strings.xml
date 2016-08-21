@@ -78,7 +78,8 @@ Thomas Elsensohn
     <string name="google_title_text">Google Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="disconnect">Disconnect</string>
-
+    <string name="txt_map">Karte</string>
+    <string name="txt_list">Liste</string>
 
 
 </resources>

@@ -132,6 +132,8 @@ Thomas Elsensohn
     <string name="sign_out_message">You are signed out</string>
 
     <string name="sign_out">Signout</string>
+    <string name="txt_map">Karte</string>
+    <string name="txt_list">Liste</string>
 
 
 </resources>

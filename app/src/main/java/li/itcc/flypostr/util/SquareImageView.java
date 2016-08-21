@@ -1,4 +1,4 @@
-package li.itcc.flypostr.guiutil;
+package li.itcc.flypostr.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
