@@ -115,6 +115,11 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     }
 
     @Override
+    public void onPostingDeleted(String id) {
+        finish();
+    }
+
+    @Override
     public void onError(Throwable e) {
         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
     }

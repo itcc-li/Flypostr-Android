@@ -1,4 +1,4 @@
-package li.itcc.flypostr.Profile;
+package li.itcc.flypostr.profile;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

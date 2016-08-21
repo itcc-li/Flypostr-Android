@@ -1,7 +1,6 @@
 package li.itcc.flypostr.postingDetail;
 
 import android.content.Context;
-import android.support.v4.app.LoaderManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +23,7 @@ public class PostingDetailLoader implements ValueEventListener {
 
     public interface PostingDetailLoaderCallback {
         void onPostingChanged(PostingWrapper posting);
+        void onPostingDeleted(String id);
         void onError(Throwable e);
     }
 
@@ -46,9 +46,14 @@ public class PostingDetailLoader implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        PostingBean bean = dataSnapshot.getValue(PostingBean.class);
-        PostingWrapper postingWrapper = new PostingWrapper(bean);
-        callback.onPostingChanged(postingWrapper);
+        if (dataSnapshot.exists()) {
+            PostingBean bean = dataSnapshot.getValue(PostingBean.class);
+            PostingWrapper postingWrapper = new PostingWrapper(bean);
+            callback.onPostingChanged(postingWrapper);
+        }
+        else {
+            callback.onPostingDeleted(dataSnapshot.getKey());
+        }
     }
 
     @Override

@@ -73,6 +73,7 @@
             android:src="@drawable/ic_add_white_24dp"
             app:layout_anchor="@id/LinearLayout1"
             app:layout_anchorGravity="bottom|right|end"
+            android:visibility="gone"
             />
 
     </android.support.design.widget.CoordinatorLayout>

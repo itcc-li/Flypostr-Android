@@ -22,7 +22,7 @@ public class PostingWrapper {
 
     public PostingWrapper(PostingBean bean) {
         if (bean == null) {
-            throw new NullPointerException();
+            bean = new PostingBean();
         }
         this.bean = bean;
     }

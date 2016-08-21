@@ -3,13 +3,11 @@ package li.itcc.flypostr.postingList;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.RecoverySystem;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -144,6 +142,11 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
 
             // notify ui update
             notifyDataSetChanged();
+        }
+
+        @Override
+        public void onPostingDeleted(String id) {
+            PostingListAdapter.this.onLocationRemoved(id);
         }
 
         @Override
