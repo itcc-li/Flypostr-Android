@@ -14,8 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import li.itcc.flypostr.auth.AuthUtil;
 import li.itcc.flypostr.poilist.PoiListFragment;
-import li.itcc.flypostr.poimap.PoiMapFragment;
+import li.itcc.flypostr.postingMap.PostingMapFragment;
 
 public class MainActivity extends AppCompatActivity
         implements MainNavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity
             newFragment = new PoiListFragment();
         }
         else if (position == 1) {
-            newFragment = new PoiMapFragment();
+            newFragment = new PostingMapFragment();
         }
         else if (position == 2){
             newFragment = new AboutFragment();
@@ -142,6 +143,13 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        AuthUtil.onActivityResult(this, requestCode, resultCode, data);
+    }
+
 
     @Override
     public void setTitleId(int titleId) {

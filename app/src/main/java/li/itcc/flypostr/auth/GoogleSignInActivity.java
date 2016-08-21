@@ -24,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import li.itcc.flypostr.MainActivity;
 import li.itcc.flypostr.R;
 
 /**
@@ -39,13 +38,8 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
     private static final int RC_SIGN_IN = 9001;
     private static final boolean START_MAIN_ACTIVITY = true;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
-
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
@@ -54,13 +48,6 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            if (START_MAIN_ACTIVITY) {
-                startMainAndFinish();
-                return;
-            }
-        }
         setContentView(R.layout.activity_google_sign_in);
 
         // Views
@@ -72,13 +59,11 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
         findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.disconnect_button).setOnClickListener(this);
 
-        // [START config_signin]
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        // [END config_signin]
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
@@ -87,7 +72,6 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
 
         mAuth = FirebaseAuth.getInstance();
 
-        // [START auth_state_listener]
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -95,9 +79,8 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    if (START_MAIN_ACTIVITY) {
-                        startMainAndFinish();
-                    }
+                    AuthUtil.finishWithUser(GoogleSignInActivity.this, user);
+                    return;
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -110,20 +93,12 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
         // [END auth_state_listener]
     }
 
-    private void startMainAndFinish() {
-        startActivity(MainActivity.createIntent(this));
-        finish();
-    }
 
-    // [START on_start_add_listener]
     @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
-    // [END on_start_add_listener]
-
-    // [START on_stop_remove_listener]
     @Override
     public void onStop() {
         super.onStop();
@@ -131,9 +106,6 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-    // [END on_stop_remove_listener]
-
-    // [START onactivityresult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -153,9 +125,8 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
             }
         }
     }
-    // [END onactivityresult]
 
-    // [START auth_with_google]
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
@@ -185,12 +156,10 @@ public class GoogleSignInActivity extends ProgressDialogActivity implements
     }
     // [END auth_with_google]
 
-    // [START signin]
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-    // [END signin]
 
     private void signOut() {
         // Firebase sign out

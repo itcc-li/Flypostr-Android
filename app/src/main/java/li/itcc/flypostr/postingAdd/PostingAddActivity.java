@@ -42,7 +42,8 @@ import java.util.List;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
-import li.itcc.flypostr.exactlocation.ExactLocationActivity;
+import li.itcc.flypostr.auth.UserData;
+import li.itcc.flypostr.exactLocation.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
 
@@ -52,6 +53,7 @@ import li.itcc.flypostr.util.StreamUtil;
 public class PostingAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
     private static final int OPEN_GALERY = 1;
     private static final int OPEN_CAMERA = 2;
+    private static final String USER_DATA = "USER_DATA";
     private static DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
     private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private static final int PERMISSIONS_REQUEST_EXTERNAL_STORAGE_CAMERA = 102;
@@ -80,15 +82,21 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
     private boolean fIsRegistered;
     private TextView fLocationText;
     private View fExactLocationButton;
+    private UserData userData;
 
-    public static void start(Activity parent) {
+    public static void start(Activity parent, UserData userData) {
+        if (userData == null) {
+            return;
+        }
         Intent i = new Intent(parent, PostingAddActivity.class);
+        i.putExtra(USER_DATA, userData);
         parent.startActivityForResult(i, 0);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.userData = (UserData)getIntent().getExtras().get(USER_DATA);
         // we use external storage here so that the cropping activity can access the image file
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         fLocalImageFileOriginal = new File(storageDir, "TEMP_Flypostr_Original.jpg");
@@ -372,6 +380,7 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
         }
         // validation is o.k., create new bean
         PostingWrapper detail = new PostingWrapper();
+        detail.setAuthorId(this.userData.userID);
         detail.setTitle(title);
         detail.setText(text);
         detail.setLat(fLocation.getLatitude());
