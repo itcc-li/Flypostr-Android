@@ -25,7 +25,12 @@
         Flyposter:
     </string>
     <string name="definition_flypostr2">
-        1. One who illegally posts flyers or similar material in public places.\n2. A flyer, poster, etc. that is illegal posted in a public place.
+     With Flypostr messages can be left at any place, for example at a viewpoint, in a museum or at any other location. Other users who are in this place, can read messages and create comments.\n\n
+        1. Discover the beauty of the region in which you find yourself.\n\n
+        2. Swap you about your experiences and opinions of - enjoy the togetherness in the community Flypostr.\n\n
+        3. Add new attractions added locally. Discover and reports about visited places, restaurants, cafes and attractions\n\n
+        4. Receive the Flypostr community answers to your questions about the places.\n\n
+        5. This app was created as part of the second Hackathon in Liechtenstein within 51 hours. Please let us know when error messages appear. We appreciate your feedback. (Info@hackathon.li)
     </string>
     <string name="about_text">
 © itcc.li\n\n
@@ -33,8 +38,20 @@ IT Crowd Club Liechtenstein\n
 Postfach 244 Vaduz\n
 Liechtenstein\n
 info@itcc.li\n
-\n
-created by:\n
+
+Teilnehmer 2016\n
+Arthur Marxer,
+Bernhard Wanger,
+Carl Batliner,
+Christian Schweig,
+Marco Scheiber,
+Philipp Gerber,
+Sandro Pedrett,
+Simon Meier,
+Stefan Goldener,
+Yves Ripoll,
+
+Teilnehmer 2015,
 Alexander Mulkidzhanyan,
 Arthur Maxer,
 Bolaji Smith,
@@ -140,6 +157,8 @@ Thomas Elsensohn
     <string name="username">Username</string>
     <string name="profile">Profile</string>
     <string name="save">Save</string>
+    <string name="logindescription">A login is necessary to create posters or comments</string>
+    <string name="about">About</string>
 
 
 
