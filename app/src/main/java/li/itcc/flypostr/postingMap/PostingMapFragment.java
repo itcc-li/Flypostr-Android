@@ -3,6 +3,7 @@ package li.itcc.flypostr.postingMap;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -101,7 +102,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
             View rootView = inflater.inflate(R.layout.poi_map_fragment, container, false);
             FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.frame_layout);
             fCreateButton = rootView.findViewById(R.id.viw_add_button);
-            fCreateButton.setOnClickListener(new AuthenticateClickListener(getActivity(), AuthUtil.REQUEST_CODE_ADD_POSTING));
+            Intent createParams = new Intent();
+            fCreateButton.setOnClickListener(new AuthenticateClickListener(getActivity(), AuthUtil.REQUEST_CODE_ADD_POSTING, createParams));
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             container.removeView(v);
             frame.addView(v, params);

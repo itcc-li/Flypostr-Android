@@ -14,14 +14,17 @@ import android.widget.Toast;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
+import li.itcc.flypostr.auth.AuthUtil;
+import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.ImageLoader;
+
+import static android.support.customtabs.CustomTabsIntent.KEY_ID;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
 public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, ImageLoader.ImageLoaderCallback {
-    private static final String KEY_ID = "KEY_ID";
     private String id;
     private TextView title;
     private ImageView image;
@@ -31,6 +34,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
 
     private PostingDetailLoader loadTask;
     private ImageLoader loadImageTask;
+    private View button;
 
     public static void start(Activity parent, String poiId) {
         Intent i = new Intent(parent, PostingDetailActivity.class);
@@ -42,6 +46,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.posting_detail_activity);
+        id = getIntent().getExtras().getString(KEY_ID);
 
         if (getIntent().getExtras() == null) {
             onError(new IllegalArgumentException("Marker not found."));
@@ -59,8 +64,10 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
         image = (ImageView)findViewById(R.id.img_image);
         progressBar = (ProgressBar)findViewById(R.id.prg_progressLoading);
         progressText = (TextView)findViewById(R.id.txv_progressText);
-
-        id = getIntent().getExtras().getString(KEY_ID);
+        this.button = findViewById(R.id.button);
+        Intent commentIntent = new Intent();
+        commentIntent.putExtra(PoiConstants.INTENT_KEY_POSTING_ID, id);
+        this.button.setOnClickListener(new AuthenticateClickListener(this, AuthUtil.REQUEST_CODE_ADD_COMMENT, commentIntent));
     }
 
     @Override
@@ -79,6 +86,13 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
             loadImageTask.detach();
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        AuthUtil.onActivityResult(this, requestCode, resultCode, data);
+    }
+
 
     private void loadDetail(String id) {
         // enable ui elements

@@ -80,6 +80,8 @@ Thomas Elsensohn
     <string name="disconnect">Disconnect</string>
     <string name="txt_map">Karte</string>
     <string name="txt_list">Liste</string>
+    <string name="txt_add_comment">Kommentar Hinzufügen</string>
+    <string name="txt_comment_too_short">Der Kommentar ist zu kurz.</string>
 
 
 </resources>

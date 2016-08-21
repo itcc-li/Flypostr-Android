@@ -1,6 +1,7 @@
 package li.itcc.flypostr.auth;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 
 /**
@@ -9,15 +10,17 @@ import android.view.View;
 public class AuthenticateClickListener implements View.OnClickListener {
     private final Activity fParent;
     private final int requestCode;
+    private final Intent params;
 
 
-    public AuthenticateClickListener(Activity parent, int requestCode) {
+    public AuthenticateClickListener(Activity parent, int requestCode, Intent params) {
         fParent = parent;
         this.requestCode = requestCode;
+        this.params = params;
     }
 
     @Override
     public void onClick(View v) {
-        ChooserActivity.start(fParent, this.requestCode);
+        ChooserActivity.start(fParent, this.requestCode, params);
     }
 }
