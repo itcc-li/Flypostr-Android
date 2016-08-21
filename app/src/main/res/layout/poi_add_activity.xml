@@ -23,7 +23,7 @@
                 android:layout_gravity="center"
                 android:background="#ffffffdd" />
 
-            <!-- location -->
+            <!-- lastLocation -->
 
         <LinearLayout
             android:id="@+id/viw_location_panel"

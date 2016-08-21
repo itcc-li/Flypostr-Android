@@ -71,8 +71,7 @@ Philipp Gerber,
 Simon Meier,
 Thomas Elsensohn
     </string>
-    <string name="my_location">My location</string>
-    <string name="refreshing_">Refreshing...</string>
+    <string name="my_location">My lastLocation</string>
     <string name="done">Done</string>
     <string name="txt_select_picture">Select picture</string>
     <string name="txt_input_missing">Eingabe fehlt</string>
@@ -82,7 +81,7 @@ Thomas Elsensohn
     <string name="txt_your_location_gets_determined">Ihre Position wird ermittelt...</string>
     <string name="txt_lat_long_precision">{0} N, {1} O\nGenauigkeit: {2} m</string>
     <string name="txt_drag_me">Drag me</string>
-    <string name="txt_drag_me_snippet">Define exact location\nby dragging</string>
+    <string name="txt_drag_me_snippet">Define exact lastLocation\nby dragging</string>
     <string name="txt_satellite">Satellit</string>
     <string name="txt_my_location">Meine Position</string>
 

@@ -58,9 +58,19 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
         cache = new ImageCache(context, pathToStorageFolder, keepCacheFileCounter);
     }
 
+    public boolean isInProgress() {
+        if (task != null) {
+            return task.isInProgress();
+        }
+        return false;
+    }
+
     public boolean cancel() {
-        detach();
-        return task.cancel();
+        if (task != null) {
+            detach();
+            return task.cancel();
+        }
+        return true;
     }
 
     public void startProgress(String filename, ImageLoaderCallback callback) {
