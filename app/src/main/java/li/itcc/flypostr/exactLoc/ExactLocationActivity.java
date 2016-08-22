@@ -107,7 +107,7 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
         double latitude = fLocation.getLatitude();
         double longitude = fLocation.getLongitude();
         // we add 10%
-        double radius = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS * 1.1;
+        double radius = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 1.1;
         double deltaLatitude = Math.toDegrees(radius / (double)PoiConstants.EARTH_RADIUS_IN_METER);
         double cosLat = Math.cos(Math.toRadians(latitude));
         if (cosLat < 0.01) {
@@ -152,7 +152,7 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
         options.position(markerPosition).draggable(true).title(title).snippet(snippet);
         //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_48dp));
         fMarker = fGoogleMap.addMarker(options);
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(PoiConstants.FINE_LOCATION_MAX_RADIUS);
+        CircleOptions circleOptions = new CircleOptions().center(position).radius(PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER);
         fCircle = fGoogleMap.addCircle(circleOptions);
         // zoom to the correct level as soon as map is ready
         fGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -185,11 +185,11 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
                 loc.setLongitude(newPos.longitude);
                 loc.setAccuracy(1f);
                 double distance = loc.distanceTo(fLocation);
-                if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS) {
+                if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER) {
                     // jump back
                     double deltaLatitude = newPos.latitude - fLocation.getLatitude();
                     double deltaLongitude = newPos.longitude - fLocation.getLongitude();
-                    double factor = (double)PoiConstants.FINE_LOCATION_MAX_RADIUS / distance;
+                    double factor = (double)PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER / distance;
                     double newLatitude = fLocation.getLatitude() + deltaLatitude * factor;
                     double newLongitude = fLocation.getLongitude() + deltaLongitude * factor;
                     marker.setPosition(new LatLng(newLatitude, newLongitude));

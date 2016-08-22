@@ -384,13 +384,15 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
         detail.setCreatedAt(new Date());
         detail.setTitle(title);
         detail.setText(text);
-        detail.setLat(fLocation.getLatitude());
-        detail.setLng(fLocation.getLongitude());
-        if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS + 0.5) {
-            // TODO: support for exact location
-            // detail.setExactLatitude(fExactLocation.getLatitude());
-            // detail.setExactLongitude(fExactLocation.getLongitude());
+        Location loc;
+        if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER + 0.5) {
+            loc = fExactLocation;
         }
+        else {
+            loc = fLocation;
+        }
+        detail.setLat(loc.getLatitude());
+        detail.setLng(loc.getLongitude());
         PostingDetailSaver saver = new PostingDetailSaver(getApplicationContext());
         // TODO: use a listener and finish upon success
         saver.save(detail, fLocalImageFileCropped);
