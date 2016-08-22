@@ -15,6 +15,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 
 import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
@@ -25,18 +26,12 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     private File tmpFile;
     private FileDownloadTask task;
     private String filename;
-    private ImageLoaderCallback callback;
+    private BitmapLoaderCallback callback;
     private ImageCache cache;
 
     public enum ImageCacheType {
         THUMBNAILS,
         IMAGES
-    }
-
-    public interface ImageLoaderCallback {
-        void onImageLoadProgress(String filename, int progressPercent, String progressText);
-        void onImageLoaded(String filename, Bitmap bitmap);
-        void onError(Throwable e);
     }
 
     public ImageLoader(Context context, ImageCacheType cacheType) {
@@ -73,14 +68,14 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
         return true;
     }
 
-    public void startProgress(String filename, ImageLoaderCallback callback) {
+    public void startProgress(String filename, BitmapLoaderCallback callback) {
         this.callback = callback;
         this.filename = filename;
 
         Bitmap result = cache.getBitmap(filename);
 
         if (result != null) {
-            callback.onImageLoaded(filename, result);
+            callback.onBitmapLoaded(filename, result);
         } else {
             StorageReference storageRef = FirebaseStorage.getInstance().getReference(pathToStorageFolder);
 
@@ -115,7 +110,7 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
         File destFile = cache.put(filename, tmpFile);
         Bitmap image = BitmapFactory.decodeFile(destFile.getAbsolutePath());
-        callback.onImageLoaded(filename, image);
+        callback.onBitmapLoaded(filename, image);
     }
 
     @Override
@@ -132,6 +127,6 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
             progressPercent = (int)(bytesTransferred * 100L / totalByteCount);
             progressText = Integer.toString(progressPercent) + "%";
         }
-        callback.onImageLoadProgress(filename, progressPercent, progressText);
+        callback.onBitmapProgress(filename, progressPercent, progressText);
     }
 }

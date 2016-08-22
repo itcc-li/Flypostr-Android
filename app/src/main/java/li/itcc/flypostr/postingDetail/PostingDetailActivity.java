@@ -16,14 +16,17 @@ import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.AuthUtil;
 import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.model.PostingWrapper;
-import li.itcc.flypostr.util.ImageLoader;
+import li.itcc.flypostr.model.image.BitmapLoaderCallback;
+import li.itcc.flypostr.model.image.BitmapLoaderStatus;
+import li.itcc.flypostr.model.image.BitmapType;
+import li.itcc.flypostr.model.image.CachedBitmapLoader;
 
 import static li.itcc.flypostr.PoiConstants.INTENT_KEY_POSTING_ID;
 
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, ImageLoader.ImageLoaderCallback {
+public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, BitmapLoaderCallback {
     private String id;
     private TextView title;
     private ImageView image;
@@ -32,8 +35,9 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     private TextView progressText;
 
     private PostingDetailLoader postingDetailLoader;
-    private ImageLoader imageLoader;
+    private CachedBitmapLoader bitmapLoader;
     private View button;
+    private BitmapLoaderStatus bitmapDownloadStatus;
 
     public static void start(Activity parent, String poiId) {
         Intent i = new Intent(parent, PostingDetailActivity.class);
@@ -54,8 +58,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
             finish();
             return;
         }
-
-        imageLoader = new ImageLoader(this, ImageLoader.ImageCacheType.IMAGES);
+        bitmapLoader = new CachedBitmapLoader(this, BitmapType.IMAGE);
         postingDetailLoader = new PostingDetailLoader(this);
 
         title = (TextView)findViewById(R.id.txv_title);
@@ -63,6 +66,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
         image = (ImageView)findViewById(R.id.img_image);
         progressBar = (ProgressBar)findViewById(R.id.prg_progressLoading);
         progressBar.setMax(100);
+        progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.GONE);
         progressText = (TextView)findViewById(R.id.txv_progressText);
         progressText.setVisibility(View.GONE);
@@ -84,8 +88,9 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
         if (postingDetailLoader != null) {
             postingDetailLoader.detach();
         }
-        if (imageLoader != null) {
-            imageLoader.detach();
+        if (bitmapDownloadStatus != null) {
+            bitmapDownloadStatus.cancel();
+            bitmapDownloadStatus = null;
         }
     }
 
@@ -100,12 +105,12 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
         postingDetailLoader.load(id, this);
     }
 
-    private void loadImage(String filename) {
+    private void loadImage(String imageId) {
         // show progress of image loading
         progressBar.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
         // start loading
-        imageLoader.startProgress(filename, this);
+        this.bitmapDownloadStatus = bitmapLoader.load(imageId, this);
     }
 
     @Override
@@ -125,12 +130,19 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
 
     @Override
     public void onError(Throwable e) {
-        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        String message;
+        if (e != null) {
+            message = e.getMessage();
+        }
+        else {
+            message = "Error";
+        }
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
 
     @Override
-    public void onImageLoaded(String filename, Bitmap bitmap) {
+    public void onBitmapLoaded(String filename, Bitmap bitmap) {
         image.setImageBitmap(bitmap);
 
         // disable ui elements
@@ -141,7 +153,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     }
 
     @Override
-    public void onImageLoadProgress(String filename, int progressPercent, String progressText) {
+    public void onBitmapProgress(String filename, int progressPercent, String progressText) {
         this.progressBar.setProgress(progressPercent);
         this.progressText.setText(progressText);
     }

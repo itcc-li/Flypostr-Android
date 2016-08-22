@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.model.PostingWrapper;
+import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 import li.itcc.flypostr.postingDetail.PostingDetailLoader;
 import li.itcc.flypostr.util.ImageLoader;
 import li.itcc.flypostr.util.SquareImageView;
@@ -93,7 +94,7 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
         return dataList.get(position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements PostingDetailLoader.PostingDetailLoaderCallback, ImageLoader.ImageLoaderCallback {
+    public class ViewHolder extends RecyclerView.ViewHolder implements PostingDetailLoader.PostingDetailLoaderCallback, BitmapLoaderCallback {
         public TextView name;
         public TextView description;
         public TextView distance;
@@ -159,14 +160,14 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
 
 
         @Override
-        public void onImageLoaded(String filename, Bitmap bitmap) {
+        public void onBitmapLoaded(String filename, Bitmap bitmap) {
             this.bitmap = bitmap;
             this.isLoadingImage = false;
             notifyDataSetChanged();
         }
 
         @Override
-        public void onImageLoadProgress(String filename, int progressPercent, String progressText) {
+        public void onBitmapProgress(String filename, int progressPercent, String progressText) {
             this.progressText.setText(progressText);
             this.progressBar.setProgress(progressPercent);
         }

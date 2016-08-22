@@ -52,6 +52,7 @@ import li.itcc.flypostr.auth.AuthUtil;
 import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
+import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 import li.itcc.flypostr.util.ImageLoader;
 
@@ -403,7 +404,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         }
     }
 
-    private class ImageDataListener implements  ImageLoader.ImageLoaderCallback {
+    private class ImageDataListener implements BitmapLoaderCallback {
         private final MarkerWrapper markerWrapper;
 
         public ImageDataListener(MarkerWrapper markerWrapper) {
@@ -416,12 +417,12 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         }
 
         @Override
-        public void onImageLoadProgress(String filename, int progressPercent, String progressText) {
+        public void onBitmapProgress(String filename, int progressPercent, String progressText) {
             // we don't show the progress here
         }
 
         @Override
-        public void onImageLoaded(String filename, Bitmap bitmap) {
+        public void onBitmapLoaded(String filename, Bitmap bitmap) {
             markerWrapper.bitmap = bitmap;
         }
     }
