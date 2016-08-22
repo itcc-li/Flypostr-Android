@@ -1,11 +1,16 @@
 package li.itcc.flypostr.postingList;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,7 +21,6 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.RuntimeExecutionException;
 
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
@@ -29,6 +33,7 @@ import li.itcc.flypostr.postingDetail.PostingDetailActivity;
  * Created by sandro.pedrett on 21.08.2016.
  */
 public class PostingListFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,  View.OnClickListener {
+    private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private PostingListAdapter dataAdapter;
     private RecyclerView listView;
     private TextView emptyText;
@@ -65,7 +70,6 @@ public class PostingListFragment extends Fragment implements GoogleApiClient.Con
     @Override
     public void onStart() {
         super.onStart();
-
         buildGoogleApiClient();
         googleApiClient.connect();
     }
@@ -96,24 +100,40 @@ public class PostingListFragment extends Fragment implements GoogleApiClient.Con
         setHasOptionsMenu(true);
     }
 
+    // google api client
+
     @Override
     public void onConnected(Bundle bundle) {
-        try {
-            // TODO: update lastLocation e.g. periodic timer
-            Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            updateLocations(lastKnownLocation);
+        checkAndGetLocation(true);
+    }
 
-            updateTableVisibility();
-        } catch (SecurityException x) {
-            throw new RuntimeExecutionException(x);
+    private void checkAndGetLocation(boolean executeRequest) {
+        Context context = getContext();
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (executeRequest) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+            }
+        }
+        else {
+            if (googleApiClient.isConnected()) {
+                Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                updateLocations(lastKnownLocation);
+                updateTableVisibility();
+            }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        checkAndGetLocation(false);
+    }
+
 
     private void updateLocations(Location location) {
         // update locations if connected
         if (googleApiClient != null && googleApiClient.isConnected()) {
             dataAdapter.setLocation(location);
-
             dataAdapter.connect();
         }
     }

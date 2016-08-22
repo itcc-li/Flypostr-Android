@@ -416,12 +416,13 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         }
 
         @Override
-        public void onImageLoaded(String filename, Bitmap bitmap) {
-            markerWrapper.bitmap = bitmap;
+        public void onImageLoadProgress(String filename, int progressPercent, String progressText) {
+            // we don't show the progress here
         }
 
         @Override
-        public void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount) {
+        public void onImageLoaded(String filename, Bitmap bitmap) {
+            markerWrapper.bitmap = bitmap;
         }
     }
 

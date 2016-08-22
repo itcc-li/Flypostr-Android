@@ -49,9 +49,6 @@ public class GeoFireListManager implements GeoQueryEventListener {
     }
 
     public void setLastLocation(GeoLocation lastLocation) {
-        if (lastLocation == null) {
-            return;
-        }
         this.lastLocation = lastLocation;
     }
 
@@ -82,6 +79,9 @@ public class GeoFireListManager implements GeoQueryEventListener {
     }
 
     private void updateQuery(GeoLocation location, float radiusInKm) {
+        if (location == null) {
+            return;
+        }
         if (geoQuery == null) {
             geoQuery = geoFire.queryAtLocation(location, (bufferRadiusInM));
             geoQuery.addGeoQueryEventListener(this);
@@ -91,7 +91,9 @@ public class GeoFireListManager implements GeoQueryEventListener {
     }
 
     public void detach(){
-        geoQuery.removeGeoQueryEventListener(this);
+        if (geoQuery != null) {
+            geoQuery.removeAllListeners();
+        }
     }
 
     @Override

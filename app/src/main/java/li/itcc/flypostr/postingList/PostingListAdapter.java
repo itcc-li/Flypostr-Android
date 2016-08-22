@@ -106,6 +106,7 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
         private PostingDetailLoader loader;
         private ImageLoader imageLoader;
         private int position;
+        private boolean isLoadingImage;
 
         public ViewHolder(View view) {
             super(view);
@@ -116,7 +117,10 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
             description = (TextView) view.findViewById(R.id.txv_posting_description);
             distance = (TextView) view.findViewById(R.id.txv_posting_distance);
             progressBar = (ProgressBar)view.findViewById(R.id.prg_list_item_progressLoading);
+            progressBar.setMax(100);
+            progressBar.setVisibility(View.GONE);
             progressText = (TextView)view.findViewById(R.id.txv_list_item_progressText);
+            progressText.setVisibility(View.GONE);
         }
 
         public void load(String id, int position) {
@@ -136,10 +140,14 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
             item.posting = posting;
 
             if (imageLoader.isInProgress()) {
-                imageLoader.cancel();
+                this.imageLoader.cancel();
+                this.isLoadingImage = false;
             }
-            imageLoader.startProgress(posting.getImageId(), this);
-
+            String imageId = posting.getImageId();
+            if (imageId != null) {
+                this.isLoadingImage = true;
+                this.imageLoader.startProgress(imageId, this);
+            }
             // notify ui update
             notifyDataSetChanged();
         }
@@ -149,22 +157,18 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
             PostingListAdapter.this.onLocationRemoved(id);
         }
 
+
         @Override
         public void onImageLoaded(String filename, Bitmap bitmap) {
             this.bitmap = bitmap;
+            this.isLoadingImage = false;
             notifyDataSetChanged();
         }
 
         @Override
-        public void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount) {
-            if (totalByteCount >= 0) {
-                float progress = ((bytesReceived / (float)totalByteCount) * 10.0f);
-                try {
-                    progressText.setText(String.format(context.getResources().getConfiguration().locale, "%1$.0f%%", progress)); // Example: 10.215 -> "10%"
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        public void onImageLoadProgress(String filename, int progressPercent, String progressText) {
+            this.progressText.setText(progressText);
+            this.progressBar.setProgress(progressPercent);
         }
 
         @Override
@@ -193,21 +197,24 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
 
         // load posting
         holder.load(item.id, position);
-
-        holder.progressBar.setVisibility(View.VISIBLE);
-
         if (item.posting != null) {
+            // bind data
             holder.name.setText(item.posting.getTitle());
             holder.description.setText(item.posting.getText());
             holder.distance.setText(String.format(context.getResources().getConfiguration().locale, "Distance: %1$.1fm", item.distanceToCurrentLocatoin));
         }
-
-        // disable/enable progressbar
-        if (holder.bitmap != null) {
-            holder.progressBar.setVisibility(View.GONE);
-        } else {
+        // update progress visibility
+        if (holder.isLoadingImage) {
             holder.progressBar.setVisibility(View.VISIBLE);
+            holder.progressText.setVisibility(View.VISIBLE);
         }
+        else {
+            holder.progressBar.setProgress(0);
+            holder.progressText.setText("");
+            holder.progressBar.setVisibility(View.GONE);
+            holder.progressText.setVisibility(View.GONE);
+        }
+
 
         holder.image.setImageBitmap(holder.bitmap);
     }

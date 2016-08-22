@@ -34,9 +34,9 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     }
 
     public interface ImageLoaderCallback {
-        void onError(Throwable e);
+        void onImageLoadProgress(String filename, int progressPercent, String progressText);
         void onImageLoaded(String filename, Bitmap bitmap);
-        void onUpdateProgressDownload(String filename, long bytesReceived, long totalByteCount);
+        void onError(Throwable e);
     }
 
     public ImageLoader(Context context, ImageCacheType cacheType) {
@@ -122,7 +122,16 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
     public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
         long totalByteCount = taskSnapshot.getTotalByteCount();
         long bytesTransferred = taskSnapshot.getBytesTransferred();
-
-        callback.onUpdateProgressDownload(filename, bytesTransferred, totalByteCount);
+        String progressText;
+        int progressPercent;
+        if (totalByteCount <= 0) {
+            progressPercent = 0;
+            progressText = "...";
+        }
+        else {
+            progressPercent = (int)(bytesTransferred * 100L / totalByteCount);
+            progressText = Integer.toString(progressPercent) + "%";
+        }
+        callback.onImageLoadProgress(filename, progressPercent, progressText);
     }
 }
