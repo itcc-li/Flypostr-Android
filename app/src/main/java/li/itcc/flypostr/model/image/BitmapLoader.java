@@ -66,14 +66,12 @@ public class BitmapLoader {
             this.callback = callback;
         }
 
-
         private void start() {
             task = storageRef.child(imageId).getFile(localFile);
             task.addOnSuccessListener(this);
             task.addOnProgressListener(this);
             task.addOnFailureListener(this);
         }
-
 
         @Override
         public void onFailure(@NonNull Exception e) {

@@ -53,8 +53,9 @@ import li.itcc.flypostr.auth.AuthenticateClickListener;
 import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.model.image.BitmapLoaderCallback;
+import li.itcc.flypostr.model.image.BitmapType;
+import li.itcc.flypostr.model.image.CachedBitmapLoader;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
-import li.itcc.flypostr.util.ImageLoader;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -76,11 +77,13 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
     private DatabaseReference postingListRef;
     private PostingDataListener postingListener;
     private boolean fIsStarted;
+    private CachedBitmapLoader bitmapLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        this.bitmapLoader = new CachedBitmapLoader(getContext(), BitmapType.THUMBNAIL);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
 
         // TODO: use PostingDetailLoader
@@ -354,9 +357,6 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
             fMarkerToMakerWrapper.remove(markerWrapper.marker);
             markerWrapper.marker.remove();
             markerWrapper.postingRef.removeEventListener(this.postingListener);
-            if (markerWrapper.imageLoader != null) {
-                markerWrapper.imageLoader.detach();
-            }
         }
     }
 
@@ -387,10 +387,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
                 // add the image to the marker
                 String imageId = bean.imageId;
                 if (imageId != null) {
-                    ImageLoader loader = new ImageLoader(getContext(), ImageLoader.ImageCacheType.THUMBNAILS);
                     ImageDataListener listener = new ImageDataListener(markerWrapper);
-                    loader.startProgress(imageId, listener);
-                    markerWrapper.imageLoader = loader;
+                    bitmapLoader.load(imageId, listener);
                 }
             }
             else {
@@ -432,7 +430,6 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         private Marker marker;
         private String postingID;
         public DatabaseReference postingRef;
-        public ImageLoader imageLoader;
         public Bitmap bitmap;
 
         public MarkerWrapper(Marker marker, String postingID) {
