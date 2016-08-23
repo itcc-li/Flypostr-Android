@@ -1,6 +1,7 @@
 package li.itcc.flypostr.model.image;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class BitmapCacheFileManager {
 
     public BitmapCacheFileManager(Context context) {
         this.context = context;
-        File cacheDir = context.getCacheDir();
+        File cacheDir = new File(context.getCacheDir(), "bitmapcache");
         this.thumbCacheDir = new File(cacheDir, FlypostrConstants.ROOT_THUMBNAIL_STORAGE);
         if (!this.thumbCacheDir.exists()) {
             this.thumbCacheDir.mkdirs();
@@ -78,8 +79,29 @@ public class BitmapCacheFileManager {
      * Execute when app closes
      */
     public void cleanup() {
-        cleanup(this.thumbCacheDir, FlypostrConstants.KEEP_IMAGE_CACHE_THUMBNAILS);
+        // cleanup in background
+        new CleanupTask().execute();
     }
+
+    private class CleanupTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            executeCleanup();
+            return null;
+        }
+    }
+
+    private void executeCleanup() {
+        try {
+            cleanup(this.thumbCacheDir, FlypostrConstants.KEEP_IMAGE_CACHE_THUMBNAILS);
+            cleanup(this.imageCacheDir, FlypostrConstants.KEEP_IMAGE_CACHE_IMAGES);
+        }
+        catch (Exception x) {
+            // ignor
+        }
+    }
+
 
     private void cleanup(File dir, int keepCount) {
         File[] files = dir.listFiles(new FileFilter() {

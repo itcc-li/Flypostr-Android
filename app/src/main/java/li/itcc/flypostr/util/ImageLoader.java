@@ -19,6 +19,7 @@ import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
+ * TODO: remove, use CachedBitmapLoader instead.
  */
 public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnapshot>, OnProgressListener<FileDownloadTask.TaskSnapshot>, OnFailureListener {
     private final String pathToStorageFolder;

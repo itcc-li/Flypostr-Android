@@ -26,9 +26,13 @@ import li.itcc.flypostr.util.FormatHelper;
 import li.itcc.flypostr.util.ImageLoader;
 import li.itcc.flypostr.util.SquareImageView;
 
+
 /**
  * Created by sandro.pedrett on 21.08.2016.
  */
+
+// TODO: remove ImageLoader, use CachedBitmapLoader instead, it uses asynchronous file reading
+
 public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.ViewHolder> implements GeoFireListManager.GeoFireListener {
     private ArrayList<PostingItemWrapper> dataList;
     private Context context;

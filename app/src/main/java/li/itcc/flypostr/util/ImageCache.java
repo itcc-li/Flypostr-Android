@@ -7,21 +7,14 @@ import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
-import java.util.WeakHashMap;
-
-import li.itcc.flypostr.R;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
+ * TODO: remove, use CachedBitmapLoader instead.
  */
 public class ImageCache {
     private final Context context;

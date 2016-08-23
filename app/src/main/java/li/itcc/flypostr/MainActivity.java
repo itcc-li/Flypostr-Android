@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import com.google.firebase.auth.FirebaseAuth;
 
 import li.itcc.flypostr.auth.AuthUtil;
+import li.itcc.flypostr.model.image.BitmapCacheFileManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -66,6 +67,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(About.createIntent(this));
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // we clean up the bitmap cache here
+        new BitmapCacheFileManager(getApplicationContext()).cleanup();
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
