@@ -14,7 +14,7 @@ public class PostingItemWrapper implements Comparable<PostingItemWrapper> {
     public final String id;
     public PostingWrapper posting;
     public LatLng location;
-    public double distanceToCurrentLocatoin;
+    public float distanceToCurrentLocationInMeter;
 
     public PostingItemWrapper(String id) {
         this.id = id;
@@ -25,7 +25,7 @@ public class PostingItemWrapper implements Comparable<PostingItemWrapper> {
         loc.setLatitude(postingLocation.latitude);
         loc.setLongitude(postingLocation.longitude);
 
-        distanceToCurrentLocatoin = loc.distanceTo(myLocation);
+        distanceToCurrentLocationInMeter = loc.distanceTo(myLocation);
     }
 
     @Override
@@ -47,9 +47,9 @@ public class PostingItemWrapper implements Comparable<PostingItemWrapper> {
 
     @Override
     public int compareTo(PostingItemWrapper another) {
-        if (distanceToCurrentLocatoin < another.distanceToCurrentLocatoin) {
+        if (distanceToCurrentLocationInMeter < another.distanceToCurrentLocationInMeter) {
             return -1;
-        } else if (distanceToCurrentLocatoin == another.distanceToCurrentLocatoin) {
+        } else if (distanceToCurrentLocationInMeter == another.distanceToCurrentLocationInMeter) {
             return 0;
         } else {
             return 1;

@@ -41,12 +41,13 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.UserData;
 import li.itcc.flypostr.exactLocation.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
+import li.itcc.flypostr.util.ValidationHelper;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -90,14 +91,14 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
             return;
         }
         Intent i = new Intent(parent, PostingAddActivity.class);
-        i.putExtra(PoiConstants.INTENT_KEY_USER_DATA, userData);
+        i.putExtra(FlypostrConstants.INTENT_KEY_USER_DATA, userData);
         parent.startActivityForResult(i, 0);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.userData = (UserData)getIntent().getExtras().get(PoiConstants.INTENT_KEY_USER_DATA);
+        this.userData = (UserData)getIntent().getExtras().get(FlypostrConstants.INTENT_KEY_USER_DATA);
         // we use external storage here so that the cropping activity can access the image file
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         fLocalImageFileOriginal = new File(storageDir, "TEMP_Flypostr_Original.jpg");
@@ -373,8 +374,12 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
 
     private void onSaveClick(View v) {
         // validate input
-        String title = poiTitle.getText().toString();
-        String text = poiText.getText().toString();
+        ValidationHelper vh = new ValidationHelper(this);
+        String title = vh.validateText(poiTitle, FlypostrConstants.VALIDTAE_POSTING_TITLE);
+        String text = vh.validateText(poiText, FlypostrConstants.VALIDTAE_POSTING_TEXT);
+        if (vh.hasErrors()) {
+            return;
+        }
         if (fLocation == null) {
             Toast.makeText(this, R.string.txt_location_missing, Toast.LENGTH_LONG).show();
             return;
@@ -389,7 +394,7 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
         if (ACCEPT_EVERY_LOCATION) {
             loc = fExactLocation;
         }
-        else if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER + 0.5) {
+        else if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER + 0.5) {
             loc = fExactLocation;
         }
         else {

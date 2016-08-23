@@ -14,7 +14,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 
 
 /**
@@ -31,10 +31,10 @@ public class BitmapLoader {
         String pathToStorageFolder;
         switch (cacheType) {
             case IMAGE:
-                pathToStorageFolder = PoiConstants.ROOT_IMAGES_STORAGE;
+                pathToStorageFolder = FlypostrConstants.ROOT_IMAGES_STORAGE;
                 break;
             case THUMBNAIL:
-                pathToStorageFolder = PoiConstants.ROOT_THUMBNAIL_STORAGE;
+                pathToStorageFolder = FlypostrConstants.ROOT_THUMBNAIL_STORAGE;
                 break;
             default:
                 throw new RuntimeException();

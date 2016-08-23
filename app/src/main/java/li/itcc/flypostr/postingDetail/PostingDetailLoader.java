@@ -8,7 +8,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.model.PostingBean;
 import li.itcc.flypostr.model.PostingWrapper;
 
@@ -30,7 +30,7 @@ public class PostingDetailLoader implements ValueEventListener {
     public PostingDetailLoader(Context context) {
         this.context = context;
 
-        this.postingListRef = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_POSTINGS);
+        this.postingListRef = FirebaseDatabase.getInstance().getReference(FlypostrConstants.ROOT_POSTINGS);
     }
 
     public void load(String id, PostingDetailLoaderCallback callback) {

@@ -2,7 +2,7 @@ package li.itcc.flypostr.model;
 
 import java.util.Date;
 
-import li.itcc.flypostr.util.ParseHelper;
+import li.itcc.flypostr.util.FormatHelper;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
@@ -60,35 +60,35 @@ public class PostingWrapper {
     }
 
     public Date getCreatedAt() {
-        return ParseHelper.convertToDate(bean.createdAt);
+        return FormatHelper.convertToDate(bean.createdAt);
     }
 
     public void setCreatedAt(Date createdAt) {
-        bean.createdAt = ParseHelper.convertToString(createdAt);
+        bean.createdAt = FormatHelper.convertToString(createdAt);
     }
 
     public Date getModifiedAt() {
-        return ParseHelper.convertToDate(bean.modifiedAt);
+        return FormatHelper.convertToDate(bean.modifiedAt);
     }
 
     public void setModifiedAt(Date modifiedAt) {
-        bean.modifiedAt = ParseHelper.convertToString(modifiedAt);
+        bean.modifiedAt = FormatHelper.convertToString(modifiedAt);
     }
 
     public int getViewCount() {
-        return ParseHelper.convertToInteger(bean.viewCount);
+        return FormatHelper.convertToInteger(bean.viewCount);
     }
 
     public void setViewCount(Integer viewCount) {
-        //bean.viewCount = ParseHelper.convertToLong(viewCount);
+        //bean.viewCount = FormatHelper.convertToLong(viewCount);
     }
 
     public int getCommentCount() {
-        return ParseHelper.convertToInteger(bean.commentCount);
+        return FormatHelper.convertToInteger(bean.commentCount);
     }
 
     public void setCommentCount(Integer commentCount) {
-        //bean.commentCount = ParseHelper.convertToLong(commentCount);
+        //bean.commentCount = FormatHelper.convertToLong(commentCount);
     }
 
     public Double getLat() {

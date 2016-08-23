@@ -3,13 +3,12 @@ package li.itcc.flypostr.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
  */
 
-public final class ParseHelper {
+public final class FormatHelper {
     private final static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
@@ -79,5 +78,23 @@ public final class ParseHelper {
         }
 
         return number.toString();
+    }
+
+    public static String convertToDistance(float distanceInMeter) {
+        if (distanceInMeter >= 1000) {
+            float distanceInKm = distanceInMeter / 1000;
+            if (distanceInKm >=10) {
+                int distInKm = (int)distanceInKm;
+                return Integer.toString(distInKm) + " km";
+
+            }
+            else {
+                return String.format("%1$.1f km", distanceInKm);
+            }
+        }
+        else {
+            int distInt = (int)distanceInMeter;
+            return Integer.toString(distInt) + " m";
+        }
     }
 }

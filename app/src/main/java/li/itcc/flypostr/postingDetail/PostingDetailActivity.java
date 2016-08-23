@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.AuthUtil;
 import li.itcc.flypostr.auth.AuthenticateClickListener;
@@ -21,7 +21,7 @@ import li.itcc.flypostr.model.image.BitmapLoaderStatus;
 import li.itcc.flypostr.model.image.BitmapType;
 import li.itcc.flypostr.model.image.CachedBitmapLoader;
 
-import static li.itcc.flypostr.PoiConstants.INTENT_KEY_POSTING_ID;
+import static li.itcc.flypostr.FlypostrConstants.INTENT_KEY_POSTING_ID;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -41,7 +41,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
 
     public static void start(Activity parent, String poiId) {
         Intent i = new Intent(parent, PostingDetailActivity.class);
-        i.putExtra(PoiConstants.INTENT_KEY_POSTING_ID, poiId);
+        i.putExtra(FlypostrConstants.INTENT_KEY_POSTING_ID, poiId);
         parent.startActivityForResult(i, 0);
     }
 
@@ -49,7 +49,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.posting_detail_activity);
-        id = getIntent().getExtras().getString(PoiConstants.INTENT_KEY_POSTING_ID);
+        id = getIntent().getExtras().getString(FlypostrConstants.INTENT_KEY_POSTING_ID);
 
         if (getIntent().getExtras() == null) {
             onError(new IllegalArgumentException("Marker not found."));

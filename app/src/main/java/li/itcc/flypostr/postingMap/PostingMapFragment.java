@@ -47,7 +47,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.TitleHolder;
 import li.itcc.flypostr.auth.AuthUtil;
@@ -59,7 +59,7 @@ import li.itcc.flypostr.model.image.BitmapType;
 import li.itcc.flypostr.model.image.CachedBitmapLoader;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 
-import static li.itcc.flypostr.PoiConstants.GEO_QUERY_RADIUS_IN_KILOMETER;
+import static li.itcc.flypostr.FlypostrConstants.GEO_QUERY_RADIUS_IN_KILOMETER;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -89,7 +89,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         this.bitmapLoader = new CachedBitmapLoader(getContext(), BitmapType.THUMBNAIL);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(FlypostrConstants.ROOT_GEOFIRE);
 
         // TODO: use PostingDetailLoader
         this.postingListRef = FirebaseDatabase.getInstance().getReference("postings");

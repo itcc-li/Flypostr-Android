@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 
 /**
  * Created by Arthur on 22.08.2016.
@@ -25,11 +25,11 @@ public class BitmapCacheFileManager {
     public BitmapCacheFileManager(Context context) {
         this.context = context;
         File cacheDir = context.getCacheDir();
-        this.thumbCacheDir = new File(cacheDir, PoiConstants.ROOT_THUMBNAIL_STORAGE);
+        this.thumbCacheDir = new File(cacheDir, FlypostrConstants.ROOT_THUMBNAIL_STORAGE);
         if (!this.thumbCacheDir.exists()) {
             this.thumbCacheDir.mkdirs();
         }
-        this.imageCacheDir = new File(cacheDir, PoiConstants.ROOT_IMAGES_STORAGE);
+        this.imageCacheDir = new File(cacheDir, FlypostrConstants.ROOT_IMAGES_STORAGE);
         if (!this.imageCacheDir.exists()) {
             this.imageCacheDir.mkdirs();
         }
@@ -78,7 +78,7 @@ public class BitmapCacheFileManager {
      * Execute when app closes
      */
     public void cleanup() {
-        cleanup(this.thumbCacheDir, PoiConstants.KEEP_IMAGE_CACHE_THUMBNAILS);
+        cleanup(this.thumbCacheDir, FlypostrConstants.KEEP_IMAGE_CACHE_THUMBNAILS);
     }
 
     private void cleanup(File dir, int keepCount) {

@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import java.util.Date;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.UserData;
 import li.itcc.flypostr.model.CommentWrapper;
@@ -33,8 +33,8 @@ public class CommentAddActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.userData = (UserData)getIntent().getExtras().get(PoiConstants.INTENT_KEY_USER_DATA);
-        this.postingId = (String)getIntent().getExtras().get(PoiConstants.INTENT_KEY_POSTING_ID);
+        this.userData = (UserData)getIntent().getExtras().get(FlypostrConstants.INTENT_KEY_USER_DATA);
+        this.postingId = (String)getIntent().getExtras().get(FlypostrConstants.INTENT_KEY_POSTING_ID);
         if (this.userData == null || this.postingId == null) {
             throw new NullPointerException();
         }
