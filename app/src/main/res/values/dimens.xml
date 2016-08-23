@@ -11,5 +11,11 @@
     <dimen name="icon_top_margin">24dp</dimen>
     <dimen name="icon_bottom_margin">24dp</dimen>
     <dimen name="field_width_standard">160dp</dimen>
+    <!-- material design sizes -->
+    <dimen name="cardCornerRadius">5dp</dimen>
+    <dimen name="cardLayoutMargin">10dp</dimen>
+    <dimen name="cardContentPadding">10dp</dimen>
+    <dimen name="cardElevation">5dp</dimen>
+
 
 </resources>
