@@ -51,29 +51,28 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/TextAnnotation"
                 android:id="@+id/txv_posting_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
                 android:textAlignment="textEnd"
                 android:layout_gravity="end"
                 tools:text="12.5 km"/>
 
             <TextView
+                style="@style/TextTitle"
                 android:id="@+id/txv_posting_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-5dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
                 tools:text="Das ist der Titel"/>
 
 
             <TextView
+                style="@style/TextBody"
                 android:id="@+id/txv_posting_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
                 tools:text="Das ist die Beschreibung für dieses Posting. Diese Beschreibunk könnte auch etwas länger sein."/>
 
 

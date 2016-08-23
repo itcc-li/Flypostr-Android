@@ -1,8 +1,13 @@
 package li.itcc.flypostr.util;
 
+import android.view.View;
+import android.widget.TextView;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import li.itcc.flypostr.R;
 
 /**
  * Created by sandro.pedrett on 20.08.2016.
@@ -95,6 +100,18 @@ public final class FormatHelper {
         else {
             int distInt = (int)distanceInMeter;
             return Integer.toString(distInt) + " m";
+        }
+    }
+
+    public static void formatAuthor(TextView textView, String author) {
+        if (author == null || author.length() == 0) {
+            textView.setText(null);
+            textView.setVisibility(View.GONE);
+        }
+        else {
+            String text = textView.getResources().getString(R.string.txt_author) + ": " + author;
+            textView.setText(text);
+            textView.setVisibility(View.VISIBLE);
         }
     }
 }

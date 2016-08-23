@@ -387,6 +387,7 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
         // validation is o.k., create new bean
         PostingWrapper detail = new PostingWrapper();
         detail.setAuthorId(this.userData.userID);
+        detail.setAuthor(this.userData.displayName);
         detail.setCreatedAt(new Date());
         detail.setTitle(title);
         detail.setText(text);

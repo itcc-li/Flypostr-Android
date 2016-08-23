@@ -35,6 +35,15 @@ public class PostingWrapper {
         bean.authorId = authorId;
     }
 
+    public String getAuthor() {
+        return bean.author;
+    }
+
+    public void setAuthor(String author) {
+        bean.author = author;
+    }
+
+
     public String getTitle() {
         return bean.title;
     }

@@ -158,7 +158,7 @@ Thomas Elsensohn
     <string name="save">Save</string>
     <string name="logindescription">A login is necessary to create posters or comments</string>
     <string name="about">About</string>
-
+    <string name="txt_author">Author</string>
 
 
 </resources>

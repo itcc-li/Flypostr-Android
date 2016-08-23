@@ -156,7 +156,7 @@ Thomas Elsensohn
     <string name="profile">Profil</string>
     <string name="logindescription">Der Login ist nötig um Poster oder Kommentare zu erstellen</string>
     <string name="about">Über</string>
-
+    <string name="txt_author">Author</string>
 
 
 </resources>

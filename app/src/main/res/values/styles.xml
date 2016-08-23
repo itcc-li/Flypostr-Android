@@ -45,7 +45,18 @@
         <item name="android:textSize">36sp</item>
     </style>
 
+    <style name="TextAnnotation">
+        <item name="android:textSize">12sp</item>
+    </style>
 
+    <style name="TextBody">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 
 </resources>

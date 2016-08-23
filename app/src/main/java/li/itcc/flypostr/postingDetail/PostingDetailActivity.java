@@ -20,8 +20,8 @@ import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 import li.itcc.flypostr.model.image.BitmapLoaderStatus;
 import li.itcc.flypostr.model.image.BitmapType;
 import li.itcc.flypostr.model.image.CachedBitmapLoader;
+import li.itcc.flypostr.util.FormatHelper;
 
-import static li.itcc.flypostr.FlypostrConstants.INTENT_KEY_POSTING_ID;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -29,6 +29,7 @@ import static li.itcc.flypostr.FlypostrConstants.INTENT_KEY_POSTING_ID;
 public class PostingDetailActivity extends AppCompatActivity implements PostingDetailLoader.PostingDetailLoaderCallback, BitmapLoaderCallback {
     private String id;
     private TextView title;
+    private TextView author;
     private ImageView image;
     private TextView text;
     private ProgressBar progressBar;
@@ -63,6 +64,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
 
         title = (TextView)findViewById(R.id.txv_title);
         text = (TextView)findViewById(R.id.txv_text);
+        author = (TextView)findViewById(R.id.txv_author);
         image = (ImageView)findViewById(R.id.img_image);
         progressBar = (ProgressBar)findViewById(R.id.prg_progressLoading);
         progressBar.setMax(100);
@@ -72,7 +74,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
         progressText.setVisibility(View.GONE);
         this.button = findViewById(R.id.button);
         Intent commentIntent = new Intent();
-        commentIntent.putExtra(INTENT_KEY_POSTING_ID, id);
+        commentIntent.putExtra(FlypostrConstants.INTENT_KEY_POSTING_ID, id);
         this.button.setOnClickListener(new AuthenticateClickListener(this, AuthUtil.REQUEST_CODE_ADD_COMMENT, commentIntent));
     }
 
@@ -117,6 +119,7 @@ public class PostingDetailActivity extends AppCompatActivity implements PostingD
     public void onPostingChanged(PostingWrapper posting) {
         title.setText(posting.getTitle());
         text.setText(posting.getText());
+        FormatHelper.formatAuthor(author, posting.getAuthor());
         String imageId = posting.getImageId();
         if (imageId != null) {
             loadImage(imageId);
