@@ -2,7 +2,7 @@ package li.itcc.flypostr.model;
 
 import java.util.Date;
 
-import li.itcc.flypostr.util.ParseHelper;
+import li.itcc.flypostr.util.FormatHelper;
 
 /**
  * Created by Arthur on 21.08.2016.
@@ -37,11 +37,11 @@ public class CommentWrapper {
     }
 
     public Date getCreatedAt() {
-        return ParseHelper.convertToDate(bean.createdAt);
+        return FormatHelper.convertToDate(bean.createdAt);
     }
 
     public void setCreatedAt(Date createdAt) {
-        bean.createdAt = ParseHelper.convertToString(createdAt);
+        bean.createdAt = FormatHelper.convertToString(createdAt);
     }
 
     public String getText() {

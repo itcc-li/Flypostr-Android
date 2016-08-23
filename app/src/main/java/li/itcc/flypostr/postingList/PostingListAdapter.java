@@ -22,6 +22,7 @@ import li.itcc.flypostr.R;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 import li.itcc.flypostr.postingDetail.PostingDetailLoader;
+import li.itcc.flypostr.util.FormatHelper;
 import li.itcc.flypostr.util.ImageLoader;
 import li.itcc.flypostr.util.SquareImageView;
 
@@ -202,7 +203,7 @@ public class PostingListAdapter extends RecyclerView.Adapter<PostingListAdapter.
             // bind data
             holder.name.setText(item.posting.getTitle());
             holder.description.setText(item.posting.getText());
-            holder.distance.setText(String.format(context.getResources().getConfiguration().locale, "Distance: %1$.1fm", item.distanceToCurrentLocatoin));
+            holder.distance.setText(FormatHelper.convertToDistance(item.distanceToCurrentLocationInMeter));
         }
         // update progress visibility
         if (holder.isLoadingImage) {
