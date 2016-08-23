@@ -1,12 +1,10 @@
-package li.itcc.flypostr.exactLoc;
+package li.itcc.flypostr.exactLocation;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,11 +19,10 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
+import li.itcc.flypostr.postingAdd.PostingAddActivity;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -34,8 +31,7 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
     private static final String KEY_LOCATION = "KEY_LOCATION";
     private static final String KEY_EXACT_LOCATION = "KEY_EXACT_LOCATION";
     public static final String RESULT_KEY = "RESULT_KEY";
-    private Location fLocation;
-    private Marker fMarker;
+    private Location fGpsLocation;
     private GoogleMap fGoogleMap;
     private Circle fCircle;
     private LatLngBounds fViewArea;
@@ -61,10 +57,10 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fLocation = getIntent().getExtras().getParcelable("KEY_LOCATION");
+        fGpsLocation = getIntent().getExtras().getParcelable("KEY_LOCATION");
         fExactLocation = getIntent().getExtras().getParcelable("KEY_EXACT_LOCATION");
         updateViewArea();
-        setContentView(R.layout.fine_poistion_activity);
+        setContentView(R.layout.exact_location_activity);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.smf_map_fragment);
         if (savedInstanceState != null) {
             fExactLocation = savedInstanceState.getParcelable(KEY_EXACT_LOCATION);
@@ -104,8 +100,15 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
 
 
     private void updateViewArea() {
-        double latitude = fLocation.getLatitude();
-        double longitude = fLocation.getLongitude();
+        Location initialLocation;
+        if (fExactLocation != null) {
+            initialLocation = fExactLocation;
+        }
+        else {
+            initialLocation = fGpsLocation;
+        }
+        double latitude = initialLocation.getLatitude();
+        double longitude = initialLocation.getLongitude();
         // we add 10%
         double radius = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 1.1;
         double deltaLatitude = Math.toDegrees(radius / (double)PoiConstants.EARTH_RADIUS_IN_METER);
@@ -126,34 +129,105 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
     }
 
 
+    private class CameraPositionCatcher implements GoogleMap.OnCameraIdleListener {
+
+        @Override
+        public void onCameraIdle() {
+            handleNewCameraPosition();
+        }
+
+    }
+
+    private void handleNewCameraPosition() {
+        Location selectedLocation = toLocation(fGoogleMap.getCameraPosition().target);
+        // check if we are within the circle
+        Location correctedLocation = getCorrectedLocation(fGpsLocation, selectedLocation);
+        fExactLocation = correctedLocation;
+        if (correctedLocation != selectedLocation) {
+            // selected location is not ok, move map back
+            LatLng newCameraPos = toLatLng(correctedLocation);
+            fGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(newCameraPos));
+            // show the circle
+            if (fCircle == null) {
+                CircleOptions circleOptions = new CircleOptions();
+                circleOptions.center(toLatLng(fGpsLocation));
+                circleOptions.radius(PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER);
+                circleOptions.strokeColor(ContextCompat.getColor(this, R.color.crosshair_circle));
+                fCircle = fGoogleMap.addCircle(circleOptions);
+            }
+        }
+    }
+
+    private LatLng toLatLng(Location location) {
+        LatLng result = new LatLng(location.getLatitude(), location.getLongitude());
+        return result;
+    }
+
+    private Location toLocation(LatLng location) {
+        Location result = new Location("Exact");
+        result.setLatitude(location.latitude);
+        result.setLongitude(location.longitude);
+        result.setAccuracy(0.5f);
+        return result;
+    }
+
+    private Location getCorrectedLocation(Location gpsLocation, Location selectedLocation) {
+        if (PostingAddActivity.ACCEPT_EVERY_LOCATION) {
+            return selectedLocation;
+        }
+        double distance = selectedLocation.distanceTo(fGpsLocation);
+        if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 10) {
+            // crazy selected position, go back to gps
+            return gpsLocation;
+        }
+        else if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER) {
+            // calculate best possible position
+            double deltaLatitude = selectedLocation.getLatitude() - gpsLocation.getLatitude();
+            double deltaLongitude = selectedLocation.getLongitude() - gpsLocation.getLongitude();
+            double factor = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER / distance;
+            double newLatitude = fGpsLocation.getLatitude() + deltaLatitude * factor;
+            double newLongitude = fGpsLocation.getLongitude() + deltaLongitude * factor;
+            Location correctedLocation = new Location("Exact");
+            correctedLocation.setLatitude(newLatitude);
+            correctedLocation.setLongitude(newLongitude);
+            return correctedLocation;
+        }
+        else {
+            // selected position is ok
+            return selectedLocation;
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap map) {
         fGoogleMap = map;
-        LatLng position = new LatLng(fLocation.getLatitude(), fLocation.getLongitude());
         fGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        fGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18.0f));
+        LatLng gpsLoc = toLatLng(fGpsLocation);
+        Location initialCameraLocation;
+        if (fExactLocation == null) {
+            initialCameraLocation = fGpsLocation;
+        }
+        else {
+            initialCameraLocation = fExactLocation;
+        }
+        LatLng initialLoc = toLatLng(initialCameraLocation);
+        fGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLoc, 18.0f));
+        CameraPositionCatcher listener = new CameraPositionCatcher();
+        fGoogleMap.setOnCameraIdleListener(listener);
         UiSettings settings = fGoogleMap.getUiSettings();
         settings.setMyLocationButtonEnabled(false);
         settings.setMapToolbarEnabled(false);
         settings.setCompassEnabled(false);
         settings.setIndoorLevelPickerEnabled(false);
-        settings.setScrollGesturesEnabled(false);
-        settings.setZoomGesturesEnabled(false);
+        settings.setScrollGesturesEnabled(true);
+        settings.setZoomGesturesEnabled(true);
         settings.setRotateGesturesEnabled(false);
         settings.setTiltGesturesEnabled(false);
         settings.setZoomControlsEnabled(false);
-        LatLng markerPosition = position;
+        LatLng cameraPosition = gpsLoc;
         if (fExactLocation != null) {
-            markerPosition = new LatLng(fExactLocation.getLatitude(), fExactLocation.getLongitude());
+            cameraPosition = new LatLng(fExactLocation.getLatitude(), fExactLocation.getLongitude());
         }
-        String title = getString(R.string.txt_drag_me);
-        String snippet = getString(R.string.txt_drag_me_snippet);
-        MarkerOptions options = new MarkerOptions();
-        options.position(markerPosition).draggable(true).title(title).snippet(snippet);
-        //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_48dp));
-        fMarker = fGoogleMap.addMarker(options);
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER);
-        fCircle = fGoogleMap.addCircle(circleOptions);
         // zoom to the correct level as soon as map is ready
         fGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -161,50 +235,9 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
                 onMapLoadedImpl();
             }
         });
-        fGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                // no default behavior
-                return true;
-            }
-        });
-        fGoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-            }
 
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                LatLng newPos = marker.getPosition();
-                Location loc = new Location("Exact");
-                loc.setLatitude(newPos.latitude);
-                loc.setLongitude(newPos.longitude);
-                loc.setAccuracy(1f);
-                double distance = loc.distanceTo(fLocation);
-                if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER) {
-                    // jump back
-                    double deltaLatitude = newPos.latitude - fLocation.getLatitude();
-                    double deltaLongitude = newPos.longitude - fLocation.getLongitude();
-                    double factor = (double)PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER / distance;
-                    double newLatitude = fLocation.getLatitude() + deltaLatitude * factor;
-                    double newLongitude = fLocation.getLongitude() + deltaLongitude * factor;
-                    marker.setPosition(new LatLng(newLatitude, newLongitude));
-                    loc.setLatitude(newLatitude);
-                    loc.setLongitude(newLongitude);
-                }
-                fExactLocation = loc;
-                // remember that the user has done a successful drag
-                SharedPreferences settings = getSharedPreferences("PREF_NAME", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("DragDone", true);
-                editor.commit();
-            }
-        });
     }
+
 
     private void onMapLoadedImpl() {
         // zoom
@@ -222,26 +255,10 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
         });
     }
 
+
     private void onZoomFinish() {
         // switch to satellite mode
         fGoogleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-
-        SharedPreferences settings = getSharedPreferences("PREF_NAME", Context.MODE_PRIVATE);
-        boolean dragDone = settings.getBoolean("DragDone", false);
-        if (dragDone) {
-            // don't show drag tip
-            return;
-        }
-        fMarker.showInfoWindow();
-        // hide info window after 3 secs
-        new Handler(this.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (fMarker.isInfoWindowShown()) {
-                    fMarker.hideInfoWindow();
-                }
-            }
-            {}},3000);
     }
 
 }

@@ -44,7 +44,7 @@ import java.util.List;
 import li.itcc.flypostr.PoiConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.auth.UserData;
-import li.itcc.flypostr.exactLoc.ExactLocationActivity;
+import li.itcc.flypostr.exactLocation.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
 
@@ -52,6 +52,7 @@ import li.itcc.flypostr.util.StreamUtil;
  * Created by Arthur on 12.09.2015.
  */
 public class PostingAddActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnRequestPermissionsResultCallback {
+    public static final boolean ACCEPT_EVERY_LOCATION = false;
     private static final int OPEN_GALERY = 1;
     private static final int OPEN_CAMERA = 2;
     private static DecimalFormat FORMAT_1 = new DecimalFormat("##0.000000");
@@ -385,7 +386,10 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
         detail.setTitle(title);
         detail.setText(text);
         Location loc;
-        if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER + 0.5) {
+        if (ACCEPT_EVERY_LOCATION) {
+            loc = fExactLocation;
+        }
+        else if (fExactLocation != null && fLocation.distanceTo(fExactLocation) < PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER + 0.5) {
             loc = fExactLocation;
         }
         else {

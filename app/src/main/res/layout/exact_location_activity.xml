@@ -1,0 +1,23 @@
+<RelativeLayout android:id="@+id/confirm_address_map_wrapper"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".exactLocation.ExactLocationActivity">
+
+    <fragment
+        android:id="@+id/smf_map_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        />
+
+    <!-- Image View that acts as map marker notice centerInParent-->
+    <ImageView
+        android:id="@+id/confirm_address_map_custom_marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/crosshairs"/>
+</RelativeLayout>
