@@ -47,6 +47,7 @@ import li.itcc.flypostr.auth.UserData;
 import li.itcc.flypostr.exactLocation.ExactLocationActivity;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.StreamUtil;
+import li.itcc.flypostr.util.ValidationHelper;
 
 /**
  * Created by Arthur on 12.09.2015.
@@ -373,8 +374,12 @@ public class PostingAddActivity extends AppCompatActivity implements GoogleApiCl
 
     private void onSaveClick(View v) {
         // validate input
-        String title = poiTitle.getText().toString();
-        String text = poiText.getText().toString();
+        ValidationHelper vh = new ValidationHelper(this);
+        String title = vh.validateText(poiTitle, FlypostrConstants.VALIDTAE_POSTING_TITLE);
+        String text = vh.validateText(poiText, FlypostrConstants.VALIDTAE_POSTING_TEXT);
+        if (vh.hasErrors()) {
+            return;
+        }
         if (fLocation == null) {
             Toast.makeText(this, R.string.txt_location_missing, Toast.LENGTH_LONG).show();
             return;
