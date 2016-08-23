@@ -14,7 +14,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.model.image.BitmapLoaderCallback;
 
 /**
@@ -38,12 +38,12 @@ public class ImageLoader implements OnSuccessListener<FileDownloadTask.TaskSnaps
         int keepCacheFileCounter;
         switch (cacheType) {
             case IMAGES:
-                this.pathToStorageFolder = PoiConstants.ROOT_IMAGES_STORAGE;
-                keepCacheFileCounter = PoiConstants.KEEP_IMAGE_CACHE_IMAGES;
+                this.pathToStorageFolder = FlypostrConstants.ROOT_IMAGES_STORAGE;
+                keepCacheFileCounter = FlypostrConstants.KEEP_IMAGE_CACHE_IMAGES;
                 break;
             case THUMBNAILS:
-                this.pathToStorageFolder = PoiConstants.ROOT_THUMBNAIL_STORAGE;
-                keepCacheFileCounter = PoiConstants.KEEP_IMAGE_CACHE_THUMBNAILS;
+                this.pathToStorageFolder = FlypostrConstants.ROOT_THUMBNAIL_STORAGE;
+                keepCacheFileCounter = FlypostrConstants.KEEP_IMAGE_CACHE_THUMBNAILS;
                 break;
             default:
                 throw new RuntimeException();

@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.commentAdd.CommentAddActivity;
 import li.itcc.flypostr.postingAdd.PostingAddActivity;
 
@@ -27,14 +27,14 @@ public class AuthUtil {
         UserData userData = new UserData();
         userData.displayName = user.getDisplayName();
         userData.userID = user.getUid();
-        params.putExtra(PoiConstants.INTENT_KEY_USER_DATA, userData);
+        params.putExtra(FlypostrConstants.INTENT_KEY_USER_DATA, userData);
         activity.setResult(AUTHENTICATION_OK, params);
         activity.finish();
     }
 
     public static void onActivityResult(Activity parent, int requestCode, int resultCode, Intent data) {
         if (resultCode == AUTHENTICATION_OK) {
-            UserData userData = (UserData)data.getExtras().get(PoiConstants.INTENT_KEY_USER_DATA);
+            UserData userData = (UserData)data.getExtras().get(FlypostrConstants.INTENT_KEY_USER_DATA);
             if (requestCode == REQUEST_CODE_ADD_POSTING) {
                 PostingAddActivity.start(parent, userData);
             }

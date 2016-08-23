@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 
 /**
  * Created by sandro.pedrett on 21.08.2016.
@@ -53,7 +53,7 @@ public class GeoFireListManager implements GeoQueryEventListener {
     }
 
     public void initializeGeoFire() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(FlypostrConstants.ROOT_GEOFIRE);
         geoFire = new GeoFire(ref);
     }
 

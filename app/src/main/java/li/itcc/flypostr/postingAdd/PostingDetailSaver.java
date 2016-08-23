@@ -21,7 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.model.PostingWrapper;
 import li.itcc.flypostr.util.ImageCache;
 import li.itcc.flypostr.util.StreamUtil;
@@ -48,14 +48,14 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
             imageID = null;
         }
         // upload data
-        DatabaseReference postingListRef = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_POSTINGS);
+        DatabaseReference postingListRef = FirebaseDatabase.getInstance().getReference(FlypostrConstants.ROOT_POSTINGS);
         DatabaseReference childRef = postingListRef.push();
         this.key = childRef.getKey();
         detail.setImageId(imageID);
         childRef.setValue(detail.getBean(), this);
         // upload geolocation
         if (detail.getLat() != null && detail.getLng() != null) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(PoiConstants.ROOT_GEOFIRE);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(FlypostrConstants.ROOT_GEOFIRE);
             GeoFire geoFire = new GeoFire(ref);
             GeoLocation geoLoc = new GeoLocation(detail.getLat(), detail.getLng());
             geoFire.setLocation(this.key, geoLoc);
@@ -63,12 +63,12 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
         // upload image
         // TODO: set imageId after image and thumbnail are uploaded
         if (imageID != null) {
-            ImageCache cacheThumb = new ImageCache(context, PoiConstants.ROOT_THUMBNAIL_STORAGE, -1);
-            ImageCache cacheImage = new ImageCache(context, PoiConstants.ROOT_IMAGES_STORAGE, -1);
+            ImageCache cacheThumb = new ImageCache(context, FlypostrConstants.ROOT_THUMBNAIL_STORAGE, -1);
+            ImageCache cacheImage = new ImageCache(context, FlypostrConstants.ROOT_IMAGES_STORAGE, -1);
 
             // TODO: local caching of the image, e.g. with picasso
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            StorageReference imageFileRef = storageRef.child(PoiConstants.ROOT_IMAGES_STORAGE).child(imageID);
+            StorageReference imageFileRef = storageRef.child(FlypostrConstants.ROOT_IMAGES_STORAGE).child(imageID);
             Uri fileUrl = Uri.fromFile(localImageFile);
             UploadTask imageUploadTask = imageFileRef.putFile(fileUrl);
             imageUploadTask.addOnFailureListener(this).addOnSuccessListener(this);
@@ -82,7 +82,7 @@ public class PostingDetailSaver implements DatabaseReference.CompletionListener,
                 e.printStackTrace();
                 return;
             }
-            StorageReference thumbRef = storageRef.child(PoiConstants.ROOT_THUMBNAIL_STORAGE).child(imageID);
+            StorageReference thumbRef = storageRef.child(FlypostrConstants.ROOT_THUMBNAIL_STORAGE).child(imageID);
             Uri localThumbFileUrl = Uri.fromFile(localThumbFile);
             UploadTask thumbUploadTask = thumbRef.putFile(localThumbFileUrl);
             thumbUploadTask.addOnFailureListener(this).addOnSuccessListener(this);

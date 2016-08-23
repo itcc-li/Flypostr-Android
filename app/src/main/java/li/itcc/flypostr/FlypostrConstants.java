@@ -3,7 +3,7 @@ package li.itcc.flypostr;
 /**
  * Created by Arthur on 12.09.2015.
  */
-public class PoiConstants {
+public class FlypostrConstants {
 
     public static final int FINE_LOCATION_MAX_RADIUS_IN_METER = 30;
     public static final int EARTH_RADIUS_IN_METER = 6378100;

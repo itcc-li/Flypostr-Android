@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
-import li.itcc.flypostr.PoiConstants;
+import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
 import li.itcc.flypostr.postingAdd.PostingAddActivity;
 
@@ -110,8 +110,8 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
         double latitude = initialLocation.getLatitude();
         double longitude = initialLocation.getLongitude();
         // we add 10%
-        double radius = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 1.1;
-        double deltaLatitude = Math.toDegrees(radius / (double)PoiConstants.EARTH_RADIUS_IN_METER);
+        double radius = (double) FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 1.1;
+        double deltaLatitude = Math.toDegrees(radius / (double) FlypostrConstants.EARTH_RADIUS_IN_METER);
         double cosLat = Math.cos(Math.toRadians(latitude));
         if (cosLat < 0.01) {
             // avoid division by zero at north pole
@@ -151,7 +151,7 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
             if (fCircle == null) {
                 CircleOptions circleOptions = new CircleOptions();
                 circleOptions.center(toLatLng(fGpsLocation));
-                circleOptions.radius(PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER);
+                circleOptions.radius(FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER);
                 circleOptions.strokeColor(ContextCompat.getColor(this, R.color.crosshair_circle));
                 fCircle = fGoogleMap.addCircle(circleOptions);
             }
@@ -176,15 +176,15 @@ public class ExactLocationActivity extends AppCompatActivity implements OnMapRea
             return selectedLocation;
         }
         double distance = selectedLocation.distanceTo(fGpsLocation);
-        if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 10) {
+        if (distance > FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER * 10) {
             // crazy selected position, go back to gps
             return gpsLocation;
         }
-        else if (distance > PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER) {
+        else if (distance > FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER) {
             // calculate best possible position
             double deltaLatitude = selectedLocation.getLatitude() - gpsLocation.getLatitude();
             double deltaLongitude = selectedLocation.getLongitude() - gpsLocation.getLongitude();
-            double factor = (double) PoiConstants.FINE_LOCATION_MAX_RADIUS_IN_METER / distance;
+            double factor = (double) FlypostrConstants.FINE_LOCATION_MAX_RADIUS_IN_METER / distance;
             double newLatitude = fGpsLocation.getLatitude() + deltaLatitude * factor;
             double newLongitude = fGpsLocation.getLongitude() + deltaLongitude * factor;
             Location correctedLocation = new Location("Exact");
