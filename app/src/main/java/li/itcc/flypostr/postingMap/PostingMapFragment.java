@@ -34,6 +34,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -57,6 +59,8 @@ import li.itcc.flypostr.model.image.BitmapType;
 import li.itcc.flypostr.model.image.CachedBitmapLoader;
 import li.itcc.flypostr.postingDetail.PostingDetailActivity;
 
+import static li.itcc.flypostr.PoiConstants.GEO_QUERY_RADIUS_IN_KILOMETER;
+
 /**
  * Created by Arthur on 12.09.2015.
  *
@@ -78,6 +82,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
     private PostingDataListener postingListener;
     private boolean fIsStarted;
     private CachedBitmapLoader bitmapLoader;
+    private Circle fCircle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -137,13 +142,26 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         updateGeoQuery();
     }
 
+    private LatLng toLatLng(Location location) {
+        LatLng result = new LatLng(location.getLatitude(), location.getLongitude());
+        return result;
+    }
+
+
     private void updateGeoQuery() {
         if (fGoogleMap != null && fLocation != null && fIsStarted) {
             if (fGeoQuery == null) {
                 GeoLocation geoLoc = new GeoLocation(fLocation.getLatitude(), fLocation.getLongitude());
-                // creates a new query around fLocation with a radius of 20 kilometers
-                // TODO: radius
-                fGeoQuery = fGeoFire.queryAtLocation(geoLoc, 20);
+                // creates a new query around fLocation with a maximum radius
+                fGeoQuery = fGeoFire.queryAtLocation(geoLoc, GEO_QUERY_RADIUS_IN_KILOMETER);
+                // we also add a circle to the map
+                CircleOptions circleOptions = new CircleOptions();
+                circleOptions.center(toLatLng(fLocation));
+                circleOptions.radius(GEO_QUERY_RADIUS_IN_KILOMETER * 1000);
+                circleOptions.strokeColor(ContextCompat.getColor(getContext(), R.color.geoquery_circle));
+                fCircle = fGoogleMap.addCircle(circleOptions);
+
+
                 fGeoQueryEventListener = new GeoQueryEventListener() {
                     @Override
                     public void onKeyEntered(String key, GeoLocation location) {
