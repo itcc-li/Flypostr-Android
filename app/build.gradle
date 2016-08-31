@@ -84,6 +84,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.0.+'
     // see https://developers.google.com/android/guides/setup
     compile 'com.google.android.gms:play-services-maps:9.4.0'
+    compile 'com.google.maps.android:android-maps-utils:0.4+'
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.google.firebase:firebase-core:9.4.0'
 

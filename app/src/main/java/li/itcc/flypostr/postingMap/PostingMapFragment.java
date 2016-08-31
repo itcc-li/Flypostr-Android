@@ -39,13 +39,22 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.internal.zzf;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.MarkerManager;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
+import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
+import com.google.maps.android.clustering.view.ClusterRenderer;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import li.itcc.flypostr.FlypostrConstants;
 import li.itcc.flypostr.R;
@@ -69,8 +78,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
     private static final String KEY_LOCATION_ZOOM_DONE = "KEY_LOCATION_ZOOM_DONE";
     private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 101;
     private GoogleMap fGoogleMap;
+    private ClusterManager<MarkerWrapper> clusterManager;
     private HashMap<String, MarkerWrapper> fIdToMarkerWrapper = new HashMap<>();
-    private HashMap<Marker, MarkerWrapper> fMarkerToMakerWrapper = new HashMap<>();
     private View fCreateButton;
     private Location fLocation;
     private boolean fLocationZoomDone = false;
@@ -83,6 +92,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
     private boolean fIsStarted;
     private CachedBitmapLoader bitmapLoader;
     private Circle fCircle;
+    private Cluster<MarkerWrapper> lastClusterClick;
+    private MarkerWrapper lastMarkerWrapperClick;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,18 +138,40 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         fGoogleMap = googleMap;
-        fGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+
+        clusterManager = new ClusterManager<>(getContext(), fGoogleMap);
+        clusterManager.setRenderer(new PostingClusterRenderer(getContext(), fGoogleMap, clusterManager));
+        clusterManager.getClusterMarkerCollection().setOnInfoWindowAdapter(new PoiClusterInfoWindowAdapter());
+        clusterManager.getMarkerCollection().setOnInfoWindowAdapter(new PoiInfoWindowAdapter());
+        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerWrapper>() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                onClick(marker);
+            public boolean onClusterClick(Cluster<MarkerWrapper> cluster) {
+                lastClusterClick = cluster;
+                return true;
             }
         });
-        //fGoogleMap.setMyLocationEnabled(false);
-        fGoogleMap.setInfoWindowAdapter(new PoiInfoWindowAdapter());
+        clusterManager.getClusterMarkerCollection().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                return false;
+            }
+        });
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerWrapper>() {
+            @Override
+            public boolean onClusterItemClick(MarkerWrapper markerWrapper) {
+                lastMarkerWrapperClick = markerWrapper;
+                return true;
+            }
+        });
+
         fGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        fGoogleMap.setInfoWindowAdapter(clusterManager.getMarkerManager());
+        fGoogleMap.setOnCameraIdleListener(clusterManager);
+
         UiSettings setting = fGoogleMap.getUiSettings();
         setting.setMapToolbarEnabled(false);
         setting.setMyLocationButtonEnabled(true);
+
         updateGeoQuery();
     }
 
@@ -147,9 +180,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         return result;
     }
 
-
     private void updateGeoQuery() {
-        if (fGoogleMap != null && fLocation != null && fIsStarted) {
+        if (fGoogleMap != null && clusterManager != null && fLocation != null && fIsStarted) {
             if (fGeoQuery == null) {
                 GeoLocation geoLoc = new GeoLocation(fLocation.getLatitude(), fLocation.getLongitude());
                 // creates a new query around fLocation with a maximum radius
@@ -160,7 +192,6 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
                 circleOptions.radius(GEO_QUERY_RADIUS_IN_KILOMETER * 1000);
                 circleOptions.strokeColor(ContextCompat.getColor(getContext(), R.color.geoquery_circle));
                 fCircle = fGoogleMap.addCircle(circleOptions);
-
 
                 fGeoQueryEventListener = new GeoQueryEventListener() {
                     @Override
@@ -193,18 +224,12 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
             // the fragment stopped, remove listeners
             fGeoQuery.removeGeoQueryEventListener(fGeoQueryEventListener);
             fGeoQuery = null;
-            // remove all markers and data lsiteners
-
+            // remove all markers and data listeners
             for (MarkerWrapper markerWrapper : fIdToMarkerWrapper.values()) {
-                markerWrapper.marker.remove();
-                markerWrapper.postingRef.removeEventListener(this.postingListener);
+                removeMarker(markerWrapper.postingID);
             }
-            fIdToMarkerWrapper.clear();
-            fMarkerToMakerWrapper.clear();
         }
     }
-
-
 
     @Override
     public void onAttach(Context context) {
@@ -237,10 +262,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
             if (fGoogleMap != null) {
                 if (item.isChecked()) {
                     item.setChecked(false);
-                    //fGoogleMap.setMyLocationEnabled(false);
                 } else {
                     item.setChecked(true);
-                    //fGoogleMap.setMyLocationEnabled(true);
                 }
             }
             return true;
@@ -290,7 +313,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
                 .addApi(LocationServices.API)
                 .build();
     }
-
+/* TODO refactor for cluster
     private boolean onClick(Marker marker) {
         MarkerWrapper wrapper = fMarkerToMakerWrapper.get(marker);
         if (wrapper != null) {
@@ -298,7 +321,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         }
         return true;
     }
-
+*/
     // google api client
 
     @Override
@@ -352,16 +375,12 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         updateGeoQuery();
     }
 
-
     private void addMarker(double latitude, double longitude, String id) {
         LatLng loc = new LatLng(latitude, longitude);
-        MarkerOptions options = new MarkerOptions();
-        options.position(loc).draggable(true);
-        //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_48dp));
-        Marker marker = fGoogleMap.addMarker(options);
-        MarkerWrapper wrapper = new MarkerWrapper(marker, id);
+        MarkerWrapper wrapper = new MarkerWrapper(loc, id);
+        clusterManager.addItem(wrapper);
         fIdToMarkerWrapper.put(id, wrapper);
-        fMarkerToMakerWrapper.put(marker, wrapper);
+
         // add the data to the marker
         DatabaseReference postingRef = postingListRef.child(id);
         postingRef.addValueEventListener(this.postingListener);
@@ -372,9 +391,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         MarkerWrapper markerWrapper = fIdToMarkerWrapper.get(key);
         if (markerWrapper != null) {
             fIdToMarkerWrapper.remove(key);
-            fMarkerToMakerWrapper.remove(markerWrapper.marker);
-            markerWrapper.marker.remove();
             markerWrapper.postingRef.removeEventListener(this.postingListener);
+            clusterManager.removeItem(markerWrapper);
         }
     }
 
@@ -382,7 +400,7 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         MarkerWrapper markerWrapper = fIdToMarkerWrapper.get(key);
         if (markerWrapper != null) {
             LatLng newLatLng = new LatLng(latitude, longitude);
-            markerWrapper.marker.setPosition(newLatLng);
+            markerWrapper.setPosition(newLatLng);
         }
     }
 
@@ -399,8 +417,8 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
             if (dataSnapshot.exists()) {
                 PostingBean bean = dataSnapshot.getValue(PostingBean.class);
                 PostingWrapper postingWrapper = new PostingWrapper(bean);
-                markerWrapper.marker.setTitle(postingWrapper.getTitle());
-                markerWrapper.marker.setSnippet(postingWrapper.getSnippet());
+                markerWrapper.title = postingWrapper.getTitle();
+                markerWrapper.snippet = postingWrapper.getSnippet();
                 // add thumbnail
                 // add the image to the marker
                 String imageId = bean.imageId;
@@ -443,20 +461,6 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         }
     }
 
-
-    private static class MarkerWrapper {
-        private Marker marker;
-        private String postingID;
-        public DatabaseReference postingRef;
-        public Bitmap bitmap;
-
-        public MarkerWrapper(Marker marker, String postingID) {
-            this.marker = marker;
-            this.postingID = postingID;
-        }
-
-    }
-
      public class PoiInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         private View fView;
         private ImageView fImage;
@@ -466,6 +470,40 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
         public PoiInfoWindowAdapter() {
         }
 
+         @Override
+         public View getInfoWindow(Marker marker) {
+             if (fView == null) {
+                 fView = getLayoutInflater(null).inflate(R.layout.map_info_window, null);
+                 fImage = (ImageView)fView.findViewById(R.id.imv_thumbnail);
+                 fName = (TextView)fView.findViewById(R.id.txv_poi_name);
+                 fDescription = (TextView)fView.findViewById(R.id.txv_description);
+             }
+             return fView;
+         }
+
+         public View getInfoContents(Marker marker) {
+            if (lastMarkerWrapperClick == null) {
+                return null;
+            }
+            Bitmap bitmap = lastMarkerWrapperClick.bitmap;
+
+            fImage.setImageBitmap(bitmap);
+            fName.setText(lastMarkerWrapperClick.title);
+            String snippet = lastMarkerWrapperClick.snippet;
+            if (snippet == null || snippet.length() == 0) {
+                fDescription.setVisibility(View.GONE);
+            }
+            else {
+                fDescription.setText(snippet);
+                fDescription.setVisibility(View.VISIBLE);
+            }
+            return fView;
+        }
+     }
+
+    private class PoiClusterInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+        private View fView;
+
         @Override
         public View getInfoWindow(Marker marker) {
             return null;
@@ -473,26 +511,12 @@ public class PostingMapFragment extends SupportMapFragment implements GoogleApiC
 
         @Override
         public View getInfoContents(Marker marker) {
-            MarkerWrapper markerWrapper = fMarkerToMakerWrapper.get(marker);
-            if (markerWrapper == null) {
+            if (lastMarkerWrapperClick == null) {
                 return null;
             }
-            Bitmap bitmap = markerWrapper.bitmap;
+
             if (fView == null) {
-                fView = getLayoutInflater(null).inflate(R.layout.map_info_window, null);
-                fImage = (ImageView)fView.findViewById(R.id.imv_thumbnail);
-                fName = (TextView)fView.findViewById(R.id.txv_poi_name);
-                fDescription = (TextView)fView.findViewById(R.id.txv_description);
-            }
-            fImage.setImageBitmap(bitmap);
-            fName.setText(marker.getTitle());
-            String snippet = marker.getSnippet();
-            if (snippet == null || snippet.length() == 0) {
-                fDescription.setVisibility(View.GONE);
-            }
-            else {
-                fDescription.setText(snippet);
-                fDescription.setVisibility(View.VISIBLE);
+                fView = getLayoutInflater(null).inflate(R.layout.map_clusterinfo_window, null);
             }
             return fView;
         }
