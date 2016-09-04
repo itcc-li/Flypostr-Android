@@ -77,6 +77,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // see https://developer.android.com/topic/libraries/support-library/features.html
+    // Note: 24.2.0 does NOT work. It has a problem with the floating button
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
     // see https://developer.android.com/training/material/lists-cards.html
